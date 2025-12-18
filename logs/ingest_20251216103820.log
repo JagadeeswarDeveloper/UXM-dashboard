@@ -1,0 +1,24 @@
+2025-12-16 10:38:20,074 [INFO] Logging initialized. Writing to logs\ingest_20251216103820.log
+2025-12-16 10:38:20,075 [INFO] Starting processing of HappySignals 2024-11-24-2025-11-25 (1).xlsx
+2025-12-16 10:38:23,332 [INFO] File loaded. Total rows: 8530
+2025-12-16 10:38:27,280 [INFO] Audit log started with ID: 2
+2025-12-16 10:38:27,280 [INFO] Processing chunk 1/2 (Rows 0 to 5000)
+2025-12-16 10:38:32,950 [WARNING] Database error on attempt 1/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:39,704 [WARNING] Database error on attempt 2/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:44,364 [WARNING] Database error on attempt 3/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:44,365 [ERROR] Failed JSON payload snippet: [{"created_date": "2024-12-13 01:03:23", "load_date": "2025-12-16", "ticket_id": "ITE1000896", "location": "Stockholm Office", "happiness_score": 3.0, "comment": "I have to use my private phone because the company device does not have good enoug battery life", "lost_time_minutes": 472, "channel": "Email", "company": "Acme Sverige AB", "country": "SE", "service_ticket_type": "Overall IT Experience", "enterprise_class": "", "department": "Sales", "region": "EMEA", "role": "Sales Manager", "top_company": "", "sub_company": "", "factors": "{\"Extra Data\": \"nan\", \"Tags\": \"nan\"}", "respondent_email": null, "translated_comment": null, "burnout_risk_score": null, "survey_id": "HS-ITE1000896-20241213010323-a069caa4"}, {"created_date": "2024-12-13 03:26:56", "load_date": "2025-12-16", "ticket_id": "ITE1001584", "location": "Espoo Office", "happiness_score": 8.0, "comment": "All else is good but much more meetings than there would be if we were at the office", "lost_time_minutes": 599, "ch
+2025-12-16 10:38:48,366 [ERROR] Failed to upsert batch after 3 attempts.
+2025-12-16 10:38:49,090 [INFO] Processing chunk 2/2 (Rows 5000 to 8530)
+2025-12-16 10:38:52,316 [WARNING] Database error on attempt 1/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:55,517 [WARNING] Database error on attempt 2/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:59,707 [WARNING] Database error on attempt 3/3: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name 'ExpNXT.RAW_HAPPYSIGNALS_SURVEYS'. (208) (SQLParamData)")
+2025-12-16 10:38:59,707 [ERROR] Failed JSON payload snippet: [{"created_date": "2025-04-06 04:49:59", "load_date": "2025-12-16", "ticket_id": "ITE1001933", "location": "Espoo Office", "happiness_score": 10.0, "comment": "Friendly service", "lost_time_minutes": 12, "channel": "Email", "company": "Acme Finland Oy", "country": "FI", "service_ticket_type": "Overall IT Experience", "enterprise_class": "", "department": "Product Management", "region": "EMEA", "role": "Product Engineer", "top_company": "", "sub_company": "", "factors": "{\"Extra Data\": \"nan\", \"Tags\": \"nan\"}", "respondent_email": null, "translated_comment": null, "burnout_risk_score": null, "survey_id": "HS-ITE1001933-20250406044959-0ba32e27"}, {"created_date": "2025-04-06 04:50:45", "load_date": "2025-12-16", "ticket_id": "ITE1001909", "location": "Stockholm Office", "happiness_score": 10.0, "comment": "Getting my new phone was so easy", "lost_time_minutes": 71, "channel": "Email", "company": "Acme Sverige AB", "country": "SE", "service_ticket_type": "Overall IT Experience", "en
+2025-12-16 10:39:03,708 [ERROR] Failed to upsert batch after 3 attempts.
+2025-12-16 10:39:06,135 [INFO] Audit log updated for ID: 2 with status: COMPLETED
+2025-12-16 10:39:06,135 [INFO] Processing completed.
+2025-12-16 10:39:06,135 [INFO] Stats: {
+  "rows_read": 8530,
+  "rows_inserted": 0,
+  "rows_skipped": 0,
+  "rows_failed": 8530
+}

@@ -1,0 +1,13 @@
+2025-12-12 11:41:40,683 [INFO] Logging initialized. Writing to logs\ingest_20251212114140.log
+2025-12-12 11:41:40,684 [INFO] Starting processing of sample_happysignals.xlsx
+2025-12-12 11:41:41,032 [INFO] File loaded. Total rows: 5
+2025-12-12 11:41:41,032 [INFO] Dry run: Skipping audit log start.
+2025-12-12 11:41:41,033 [INFO] Processing chunk 1/1 (Rows 0 to 5)
+2025-12-12 11:41:41,057 [INFO] Dry run: Would upsert 5 rows.
+2025-12-12 11:41:41,057 [INFO] Processing completed.
+2025-12-12 11:41:41,058 [INFO] Stats: {
+  "rows_read": 5,
+  "rows_inserted": 5,
+  "rows_skipped": 0,
+  "rows_failed": 0
+}

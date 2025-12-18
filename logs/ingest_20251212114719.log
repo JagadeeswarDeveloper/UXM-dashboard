@@ -1,0 +1,22 @@
+2025-12-12 11:47:19,589 [INFO] Logging initialized. Writing to logs\ingest_20251212114719.log
+2025-12-12 11:47:19,590 [INFO] Starting processing of HappySignals 2024-11-24-2025-11-25 (1).xlsx
+2025-12-12 11:47:22,100 [INFO] File loaded. Total rows: 8530
+2025-12-12 11:47:23,271 [INFO] Audit log started with ID: 2
+2025-12-12 11:47:23,271 [INFO] Processing chunk 1/2 (Rows 0 to 5000)
+2025-12-12 11:47:28,096 [WARNING] Database error on attempt 1/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:31,808 [WARNING] Database error on attempt 2/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:35,873 [WARNING] Database error on attempt 3/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:39,874 [ERROR] Failed to upsert batch after 3 attempts.
+2025-12-12 11:47:40,069 [INFO] Processing chunk 2/2 (Rows 5000 to 8530)
+2025-12-12 11:47:42,988 [WARNING] Database error on attempt 1/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:45,469 [WARNING] Database error on attempt 2/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:49,013 [WARNING] Database error on attempt 3/3: ('22007', '[22007] [Microsoft][ODBC SQL Server Driver][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLParamData)')
+2025-12-12 11:47:53,014 [ERROR] Failed to upsert batch after 3 attempts.
+2025-12-12 11:47:53,655 [INFO] Audit log updated for ID: 2 with status: COMPLETED
+2025-12-12 11:47:53,656 [INFO] Processing completed.
+2025-12-12 11:47:53,656 [INFO] Stats: {
+  "rows_read": 8530,
+  "rows_inserted": 0,
+  "rows_skipped": 0,
+  "rows_failed": 8530
+}

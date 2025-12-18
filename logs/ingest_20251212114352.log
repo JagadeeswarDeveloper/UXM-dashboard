@@ -1,0 +1,6 @@
+2025-12-12 11:43:52,314 [INFO] Logging initialized. Writing to logs\ingest_20251212114352.log
+2025-12-12 11:43:52,314 [INFO] Starting processing of sample_happysignals.xlsx
+2025-12-12 11:43:52,501 [INFO] File loaded. Total rows: 5
+2025-12-12 11:43:52,506 [ERROR] Failed to connect to database: ('IM002', '[IM002] [Microsoft][ODBC Driver Manager] Data source name not found and no default driver specified (0) (SQLDriverConnect)')
+2025-12-12 11:43:52,506 [ERROR] Failed to create audit log entry: ('IM002', '[IM002] [Microsoft][ODBC Driver Manager] Data source name not found and no default driver specified (0) (SQLDriverConnect)')
+2025-12-12 11:43:52,506 [ERROR] Fatal error during processing: ('IM002', '[IM002] [Microsoft][ODBC Driver Manager] Data source name not found and no default driver specified (0) (SQLDriverConnect)')

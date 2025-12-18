@@ -1,0 +1,7 @@
+pandas
+pyodbc
+python-dotenv
+openpyxl
+pytest
+fuzzywuzzy[speedup]
+python-Levenshtein

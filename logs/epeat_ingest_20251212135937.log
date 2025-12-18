@@ -1,0 +1,9 @@
+2025-12-12 13:59:37,465 [INFO] Logging initialized. Writing to logs\epeat_ingest_20251212135937.log
+2025-12-12 13:59:37,465 [INFO] Processing Advanced_ProductSummary_2025-12-12T03_12_38.xlsx
+2025-12-12 13:59:38,882 [INFO] Could not load inventory (table might be empty or missing). Comparison will be limited.
+2025-12-12 13:59:39,323 [INFO] Reading sheet: EPEAT 2.0 from ['EPEAT 1.0', 'EPEAT 2.0']
+2025-12-12 13:59:39,406 [INFO] Loaded DataFrame with shape: (98, 105)
+2025-12-12 13:59:39,407 [INFO] Columns: ['Product Id', 'Product Name', 'Climate+', 'Product Category', 'Product Type', 'Status', 'Product Url', 'Registered in', 'Manufacturer', 'Total Score']...
+2025-12-12 13:59:39,408 [INFO] Dry run: Skipping audit log start.
+2025-12-12 13:59:39,421 [INFO] Dry run: Would upsert 98 rows.
+2025-12-12 13:59:39,422 [INFO] Stats: {'rows_read': 98, 'rows_matched_inventory': 0, 'rows_inserted': 98, 'rows_skipped': 0, 'rows_failed': 0}

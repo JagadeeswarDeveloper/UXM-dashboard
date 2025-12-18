@@ -1,0 +1,16 @@
+2025-12-16 10:39:53,726 [INFO] Logging initialized. Writing to logs\ingest_20251216103953.log
+2025-12-16 10:39:53,726 [INFO] Starting processing of HappySignals 2024-11-24-2025-11-25 (1).xlsx
+2025-12-16 10:39:56,816 [INFO] File loaded. Total rows: 8530
+2025-12-16 10:40:00,807 [INFO] Audit log started with ID: 3
+2025-12-16 10:40:00,808 [INFO] Processing chunk 1/2 (Rows 0 to 5000)
+2025-12-16 10:40:07,771 [INFO] Successfully upserted batch of 5000 rows.
+2025-12-16 10:40:07,773 [INFO] Processing chunk 2/2 (Rows 5000 to 8530)
+2025-12-16 10:40:12,172 [INFO] Successfully upserted batch of 3530 rows.
+2025-12-16 10:40:13,998 [INFO] Audit log updated for ID: 3 with status: COMPLETED
+2025-12-16 10:40:13,999 [INFO] Processing completed.
+2025-12-16 10:40:13,999 [INFO] Stats: {
+  "rows_read": 8530,
+  "rows_inserted": 8530,
+  "rows_skipped": 0,
+  "rows_failed": 0
+}

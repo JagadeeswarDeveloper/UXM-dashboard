@@ -1,0 +1,184 @@
+-- 1. Create the Schema Container
+CREATE SCHEMA ExpNXT;
+GO
+
+-- =====================================================================
+-- 2. LANDING ZONE (RAW TABLES)
+-- =====================================================================
+
+-- 2.1 NEXTHINK (DEX)
+CREATE TABLE ExpNXT.RAW_NEXTHINK_METRICS (
+load_date DATE,
+event_timestamp DATETIME,
+device_id VARCHAR(100),
+device_name VARCHAR(255),
+serial_number VARCHAR(100), -- Join Key
+user_email VARCHAR(100), -- Join Key
+os VARCHAR(255),
+os_version VARCHAR(255),
+os_build VARCHAR(255),
+manufacturer VARCHAR(255),
+model_number VARCHAR(255),
+cpu_model VARCHAR(255),
+cpu_speed VARCHAR(50),
+cpu_count INT,
+ram_mb INT,
+disk_size INT,
+cpu_usage_percent DECIMAL(18,2),
+memory_usage_percent DECIMAL(18,2),
+disk_usage_percent DECIMAL(18,2),
+boot_duration_seconds DECIMAL(18,2),
+logon_duration_seconds DECIMAL(18,2),
+network_latency_ms DECIMAL(18,2),
+packet_loss_percent DECIMAL(18,2),
+wifi_signal_strength_dbm DECIMAL(18,2),
+network_throughput_mbps DECIMAL(18,2),
+jitter_ms DECIMAL(18,2),
+app_crash_count INT,
+system_freeze_count INT,
+dex_score DECIMAL(18,2),
+boot_score DECIMAL(18,2),
+logon_score DECIMAL(18,2),
+application_score DECIMAL(18,2),
+network_score DECIMAL(18,2),
+launch_time_seconds DECIMAL(18,2)
+);
+
+-- 2.2 SERVICENOW INCIDENTS (SLA)
+CREATE TABLE ExpNXT.RAW_SERVICENOW_INCIDENTS (
+load_date DATE,
+sys_id VARCHAR(100),
+incident_number VARCHAR(50),
+opened_at DATETIME,
+closed_at DATETIME,
+state VARCHAR(50),
+priority VARCHAR(50),
+impact VARCHAR(50),
+category VARCHAR(100),
+subcategory VARCHAR(100),
+close_code VARCHAR(100),
+resolution_notes VARCHAR(MAX),
+assignment_group VARCHAR(100),
+assigned_to VARCHAR(100),
+opened_by_email VARCHAR(100), -- Join Key
+reassignment_count INT,
+sla_breached_flag INT,
+business_elapsed_time INT
+);
+
+-- 2.3 SERVICENOW CHANGES (OCM)
+CREATE TABLE ExpNXT.RAW_SERVICENOW_CHANGES (
+load_date DATE,
+sys_id VARCHAR(100),
+change_number VARCHAR(50),
+device_ci_serial VARCHAR(100), -- Join Key
+type VARCHAR(50),
+risk_level VARCHAR(50),
+state VARCHAR(50),
+opened_at DATETIME,
+closed_at DATETIME,
+implementation_plan VARCHAR(MAX),
+short_description VARCHAR(MAX),
+justification VARCHAR(MAX),
+approver VARCHAR(255)
+);
+
+-- 2.4 HAPPYSIGNALS SURVEYS (UXM) - *Updated with V2 Fields*
+CREATE TABLE ExpNXT.RAW_HAPPYSIGNALS_SURVEYS (
+load_date DATE,
+survey_id VARCHAR(100),
+respondent_email VARCHAR(100), -- Join Key
+ticket_id VARCHAR(100),
+happiness_score DECIMAL(18,2),
+lost_time_minutes INT,
+factors VARCHAR(MAX),
+comment VARCHAR(MAX),
+translated_comment VARCHAR(MAX),
+department VARCHAR(255),
+location VARCHAR(255),
+country VARCHAR(255),
+role VARCHAR(255),
+region VARCHAR(255), -- Added V2
+channel VARCHAR(255), -- Added V2
+service_ticket_type VARCHAR(255),
+enterprise_class VARCHAR(255),
+burnout_risk_score DECIMAL(18,2),
+company VARCHAR(255), -- Added V2
+top_company VARCHAR(255), -- Added V2
+sub_company VARCHAR(255), -- Added V2
+created_date DATETIME
+);
+
+-- 2.5 SERVICENOW SURVEYS (UXM - Secondary)
+CREATE TABLE ExpNXT.RAW_SERVICENOW_SURVEYS (
+load_date DATE,
+survey_id VARCHAR(100),
+user_email VARCHAR(100), -- Join Key
+taken_by VARCHAR(255),
+score DECIMAL(18,2),
+rating VARCHAR(50),
+sentiment_label VARCHAR(50),
+created_on DATETIME
+);
+
+-- 2.6 ESG METRICS - *Updated with V2 Fields*
+CREATE TABLE ExpNXT.RAW_ESG_METRICS (
+load_date DATE,
+serial_number VARCHAR(100), -- Join Key
+device_model VARCHAR(255),
+on_time_seconds INT,
+idle_time_seconds INT,
+off_time_seconds INT,
+energy_consumption_kwh DECIMAL(18,4),
+co2_emissions_kg DECIMAL(18,4),
+energy_star_rating VARCHAR(50),
+epeat_rating VARCHAR(50),
+manufacturing_kg_co2 INT,
+lifecycle_kg_co2 INT,
+cpu_power_rating DECIMAL(18,2), -- Added V2
+display_power_rating DECIMAL(18,2), -- Added V2
+battery_capacity VARCHAR(50), -- Added V2
+material_composition VARCHAR(MAX) -- Added V2
+);
+
+-- =====================================================================
+-- 3. TARGET ZONE (UNIFIED TABLE)
+-- =====================================================================
+CREATE TABLE ExpNXT.UNIFIED_EXPERIENCE_DAILY_FACT (
+-- SPINE
+SNAPSHOT_DATE DATE,
+SPINE_SERIAL VARCHAR(100),
+SPINE_EMAIL VARCHAR(100),
+
+-- DEX
+DEX_DEVICE_NAME VARCHAR(255), DEX_OS_VERSION VARCHAR(50), DEX_MANUFACTURER VARCHAR(255), DEX_MODEL_NUMBER VARCHAR(255),
+DEX_CPU_USAGE_AVG DECIMAL(18,2), DEX_MEMORY_USAGE_AVG DECIMAL(18,2), DEX_DISK_USAGE_AVG DECIMAL(18,2),
+DEX_BOOT_DURATION_MAX DECIMAL(18,2), DEX_LOGON_DURATION_MAX DECIMAL(18,2),
+DEX_LATENCY_AVG DECIMAL(18,2), DEX_PACKET_LOSS_AVG DECIMAL(18,2), DEX_SIGNAL_STRENGTH_AVG DECIMAL(18,2),
+DEX_CRASH_COUNT INT, DEX_FREEZE_COUNT INT,
+DEX_SCORE_OVERALL DECIMAL(18,2), DEX_LOGON_SCORE DECIMAL(18,2), DEX_BOOT_SCORE DECIMAL(18,2),
+
+-- SLA
+SLA_INCIDENT_COUNT INT, SLA_CRITICAL_COUNT INT, SLA_BREACHED_COUNT INT,
+SLA_AVG_RESOLUTION_TIME INT, SLA_LAST_TICKET_NUMBER VARCHAR(50), SLA_LAST_CATEGORY VARCHAR(100),
+
+-- OCM
+OCM_RECENT_CHANGE_FLAG INT, OCM_LAST_CHANGE_RISK VARCHAR(50), OCM_LAST_CHANGE_TYPE VARCHAR(50),
+OCM_LAST_CHANGE_DATE DATETIME,
+
+-- UXM (HappySignals - Complete V2)
+UXM_HS_HAPPINESS_SCORE DECIMAL(18,2), UXM_HS_LOST_TIME INT, UXM_HS_COMMENT VARCHAR(MAX),
+UXM_HS_FACTORS VARCHAR(MAX), UXM_HS_DEPARTMENT VARCHAR(255), UXM_HS_BURNOUT_SCORE DECIMAL(18,2),
+UXM_HS_REGION VARCHAR(255), UXM_HS_CHANNEL VARCHAR(255), UXM_HS_COMPANY VARCHAR(255), -- V2 Fields
+
+-- UXM (ServiceNow)
+UXM_SN_CSAT_SCORE DECIMAL(18,2),
+
+-- ESG (Complete V2)
+ESG_DAILY_KWH DECIMAL(18,4), ESG_DAILY_CO2_KG DECIMAL(18,4), ESG_ON_TIME_SECONDS INT,
+ESG_EPEAT_RATING VARCHAR(50), ESG_MANUFACTURING_CO2 INT,
+ESG_BATTERY_CAPACITY VARCHAR(50), -- V2 Field
+
+-- FLAGS
+CALC_LOGON_SPEED_FLAG INT, CALC_SATISFACTION_FLAG INT
+);
