@@ -1,0 +1,343 @@
+/* Agent Dashboard - Modern Light Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+    /* Light Palette */
+    --bg-app: #F1F5F9;
+    --bg-panel: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+
+    /* Professional Accents */
+    --accent-blue: #2563EB;
+    /* Royal Blue */
+    --accent-indigo: #4F46E5;
+    /* Indigo */
+    --accent-teal: #0D9488;
+    /* Teal */
+    --accent-rose: #E11D48;
+    /* Rose Red */
+    --accent-amber: #D97706;
+    /* Amber */
+
+    /* Glass/Card Effects */
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --card-border: 1px solid #E2E8F0;
+    --card-radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-app);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Utilities */
+.glass-panel {
+    background: var(--bg-panel);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+}
+
+.glass-panel:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.text-blue {
+    color: var(--accent-blue);
+}
+
+.text-indigo {
+    color: var(--accent-indigo);
+}
+
+.text-teal {
+    color: var(--accent-teal);
+}
+
+.text-rose {
+    color: var(--accent-rose);
+}
+
+.text-amber {
+    color: var(--accent-amber);
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Layout */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 260px 1fr 300px;
+    gap: 20px;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    background: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 10;
+}
+
+.brand-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.hierarchy-tree {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tree-node {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.tree-node:hover {
+    background: #F8FAFC;
+    color: var(--accent-blue);
+}
+
+.tree-node.active {
+    background: #EFF6FF;
+    /* Light blue bg */
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.node-children {
+    padding-left: 16px;
+    border-left: 1px solid #E2E8F0;
+    margin-left: 10px;
+}
+
+/* Main Content */
+.main-content {
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.view-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.page-header {
+    background: var(--bg-panel);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--card-shadow);
+}
+
+/* KPIs */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.kpi-card {
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 8px 0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.kpi-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.kpi-trend {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Team Grid specific to Team View */
+.team-stats-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+}
+
+/* Details & Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #F1F5F9;
+    color: var(--text-primary);
+}
+
+tr:hover td {
+    background: #F8FAFC;
+}
+
+/* Right Panel (Feed) */
+.feed-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.feed-item {
+    margin-bottom: 12px;
+    padding: 12px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.feed-item:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.feed-item.urgent {
+    border-left-color: var(--accent-rose);
+    background: #FFF1F2;
+}
+
+.feed-time {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.feed-text {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+/* Badges */
+.badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.badge-blue {
+    background: #EFF6FF;
+    color: var(--accent-blue);
+}
+
+.badge-purp {
+    background: #F5F3FF;
+    color: var(--accent-indigo);
+}
+
+.badge-red {
+    background: #FFF1F2;
+    color: var(--accent-rose);
+}
+
+.badge-teal {
+    background: #F0FDFA;
+    color: var(--accent-teal);
+}
+
+/* Helper classes for switching views */
+.hidden {
+    display: none !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}

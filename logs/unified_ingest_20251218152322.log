@@ -1,0 +1,7 @@
+2025-12-18 15:23:22,036 [INFO] Unified Ingestion started. Logs: logs\unified_ingest_20251218152322.log
+2025-12-18 15:23:22,037 [INFO] Dry run: Skipping schema application.
+2025-12-18 15:23:22,037 [INFO] Processing HappySignals file: HappySignals 2024-11-24-2025-11-25 (1).xlsx
+2025-12-18 15:23:31,551 [INFO] HappySignals Stats: {'rows_read': 8530, 'rows_inserted': 8530, 'rows_skipped': 0, 'rows_failed': 0}
+2025-12-18 15:23:31,553 [INFO] Processing EPEAT file: Advanced_ProductSummary_2025-12-12T03_12_38.xlsx (sheet: EPEAT 2.0)
+2025-12-18 15:23:34,731 [INFO] EPEAT Stats: {'rows_read': 98, 'rows_inserted': 98, 'rows_skipped': 0, 'rows_failed': 0, 'rows_matched_inventory': 0}
+2025-12-18 15:23:34,731 [INFO] Unified Ingestion Finished.

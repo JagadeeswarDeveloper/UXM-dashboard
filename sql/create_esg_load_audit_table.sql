@@ -13,6 +13,7 @@ BEGIN
         [rows_matched_inventory] [int] DEFAULT 0,
         [rows_inserted] [int] DEFAULT 0,
         [rows_skipped] [int] DEFAULT 0,
+        [rows_failed] [int] DEFAULT 0,
         [start_ts] [datetime] DEFAULT GETUTCDATE(),
         [end_ts] [datetime] NULL,
         [status] [varchar](50) DEFAULT 'STARTED', -- STARTED, COMPLETED, FAILED
