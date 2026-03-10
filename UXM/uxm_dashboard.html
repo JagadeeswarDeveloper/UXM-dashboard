@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UXM Enterprise Analytics</title>
+    <link rel="stylesheet" href="dashboard_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div
+                    style="width:36px; height:36px; background:var(--brand-primary); border-radius:6px; display:flex; align-items:center; justify-content:center; color:white;">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1>Enterprise UXM</h1>
+                    <p class="subtitle">Employee Sentiment & Productivity Analytics • Last Sync: 10:42 AM</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="#" class="active">UXM Overview</a>
+                <a href="esg_dashboard.html">ESG Impact</a>
+                <a href="agent_dashboard.html">Agent Command</a>
+                <a href="#">Configuration</a>
+            </nav>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Global Happiness Index -->
+            <div class="card col-4 status-warn">
+                <div class="card-header">
+                    <h3>Global Happiness Index</h3>
+                    <div class="ai-pill"><i class="fa-solid fa-sparkles"></i> Forecast: 7.2 (▼)</div>
+                </div>
+                <div
+                    style="font-size:11px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px; display:flex; gap:15px; align-items:center;">
+                    <span><i class="fa-solid fa-users" style="margin-right:4px;"></i> <strong>12,450</strong>
+                        Responses</span>
+                    <span
+                        style="background:#FEF2F2; color:var(--danger); padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700;">⚠
+                        Retention Risk: $2.4M Exposure</span>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div class="progress-circle"
+                        style="--percent: 74%; --fill-color: var(--warning); width:100px; height:100px;">
+                        <div class="progress-inner" style="width:75px; height:75px;">
+                            <span class="big-number" style="font-size:24px;">7.4</span>
+                        </div>
+                    </div>
+                    <div style="flex:1;">
+                        <div class="flex-between">
+                            <span class="subtitle">Benchmark</span>
+                            <span style="font-weight:600; font-size:12px;">8.0</span>
+                        </div>
+                        <div class="flex-between" style="margin-top:5px;">
+                            <span class="subtitle">MoM Change</span>
+                            <span class="trend-text trend-down">▼ 0.6%</span>
+                        </div>
+                        <div class="flex-between" style="margin-top:5px;">
+                            <span class="subtitle">Std Deviation</span>
+                            <span style="font-weight:600; font-size:12px;">±1.8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:15px; padding-top:12px; border-top:1px solid #F3F4F6;">
+                    <div style="font-size:11px; font-weight:600; margin-bottom:8px;">Response Distribution</div>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; font-size:10px;">
+                        <div style="background:#FEF2F2; padding:6px; border-radius:4px; text-align:center;">
+                            <div style="font-weight:700; color:var(--danger);">18%</div>
+                            <div style="color:var(--text-muted);">Unhappy (0-5)</div>
+                        </div>
+                        <div style="background:#FFFBEB; padding:6px; border-radius:4px; text-align:center;">
+                            <div style="font-weight:700; color:var(--warning);">34%</div>
+                            <div style="color:var(--text-muted);">Neutral (6-7)</div>
+                        </div>
+                        <div style="background:#ECFDF5; padding:6px; border-radius:4px; text-align:center;">
+                            <div style="font-weight:700; color:var(--success);">48%</div>
+                            <div style="color:var(--text-muted);">Happy (8-10)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="context-box">
+                    <div class="context-label">Primary Detractor</div>
+                    <p class="context-text">
+                        Feedback extraction identifies <strong>"Outlook Sync Latency"</strong> as the dominant friction
+                        point (42% of negative mentions).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Root Cause Analysis (No "Why") -->
+            <div class="card col-4 status-bad">
+                <div class="card-header">
+                    <h3>Impact Analysis</h3>
+                    <span style="font-size:11px; font-weight:600; color:var(--danger);">Critical Priority</span>
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <div class="flex-between" style="font-size:12px; font-weight:600; margin-bottom:4px;">
+                        <span>Outlook Sync (APAC) <span
+                                style="font-weight:400; color:var(--text-muted); font-size:10px;">(3,400
+                                Users)</span></span>
+                        <span style="color:var(--danger)">-0.8 Score Impact</span>
+                    </div>
+                    <div style="height:4px; background:#F3F4F6; border-radius:2px;">
+                        <div style="width:80%; height:100%; background:var(--danger); border-radius:2px;"></div>
+                    </div>
+                    <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">Correlated with Exchange
+                        Server Patch v4.2</div>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <div class="flex-between" style="font-size:12px; font-weight:600; margin-bottom:4px;">
+                        <span>VPN Dropouts (Global)</span>
+                        <span style="color:var(--warning)">-0.3 Score Impact</span>
+                    </div>
+                    <div style="height:4px; background:#F3F4F6; border-radius:2px;">
+                        <div style="width:30%; height:100%; background:var(--warning); border-radius:2px;"></div>
+                    </div>
+                </div>
+
+                <div class="context-box">
+                    <div class="context-label">Recommended Action</div>
+                    <p class="context-text">Rollback Patch v4.2 on APAC Servers immediately to recover estimated
+                        <strong>0.5 Happiness Points</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Productivity Impact -->
+            <div class="card col-4 status-neutral">
+                <div class="card-header">
+                    <h3>Productivity Loss</h3>
+                    <span style="font-size:11px; color:var(--text-muted);">Last 30 Days</span>
+                </div>
+
+                <div class="big-number">1,240 <span
+                        style="font-size:14px; color:var(--text-secondary); font-weight:500;">hrs</span></div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:15px;">
+                    <i class="fa-solid fa-coins"></i> <strong>$86,800</strong> Financial Impact <span
+                        style="font-size:10px; color:var(--text-muted);">(Avg $70/hr)</span>
+                </div>
+
+                <table style="font-size:11px;">
+                    <tbody>
+                        <tr>
+                            <td><i class="fa-solid fa-laptop"></i> Hardware</td>
+                            <td style="text-align:right;">520 hrs</td>
+                            <td style="text-align:right;">$36k</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-solid fa-wifi"></i> Network</td>
+                            <td style="text-align:right;">410 hrs</td>
+                            <td style="text-align:right;">$28k</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-brands fa-microsoft"></i> SaaS</td>
+                            <td style="text-align:right;">310 hrs</td>
+                            <td style="text-align:right;">$21k</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="context-box">
+                    <div class="context-label">ROI Opportunity</div>
+                    <p class="context-text">Invest <strong>$15k</strong> in localized VPN gateways to save estimated
+                        <strong>$28k/month</strong> in downtime.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Burnout Heatmap -->
+            <div class="card col-6 status-bad">
+                <div class="card-header">
+                    <h3>Department Burnout Risk</h3>
+                    <div class="ai-pill"><i class="fa-solid fa-sparkles"></i> Trend: Increasing</div>
+                </div>
+
+                <div style="display:flex; gap:15px; margin-bottom:15px;">
+                    <div style="flex:1; background:#FEF2F2; padding:10px; border-radius:6px; border:1px solid #FECACA;">
+                        <span
+                            style="font-size:10px; font-weight:700; color:var(--danger); text-transform:uppercase;">Highest
+                            Risk</span>
+                        <div style="font-weight:700; font-size:14px; margin-top:2px;">Sales Dept</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Avg 12h Workday</div>
+                    </div>
+                    <div style="flex:1; background:#FEF2F2; padding:10px; border-radius:6px; border:1px solid #FECACA;">
+                        <span
+                            style="font-size:10px; font-weight:700; color:var(--danger); text-transform:uppercase;">Secondary
+                            Risk</span>
+                        <div style="font-weight:700; font-size:14px; margin-top:2px;">DevOps</div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Weekend Logins: <strong>48%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <table style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Work Hours</th>
+                            <th>Sentiment</th>
+                            <th>Risk Lvl</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span style="font-weight:600;">Sales</span></td>
+                            <td>52h/wk</td>
+                            <td style="color:var(--danger)">Negative</td>
+                            <td><span
+                                    style="background:var(--danger); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">HIGH</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DevOps</td>
+                            <td>48h/wk</td>
+                            <td style="color:var(--warning)">Neutral</td>
+                            <td><span
+                                    style="background:var(--warning); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">MED</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Finance</td>
+                            <td>42h/wk</td>
+                            <td style="color:var(--success)">Positive</td>
+                            <td><span
+                                    style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">LOW</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Channel Performance -->
+            <div class="card col-6 status-good">
+                <div class="card-header">
+                    <h3>Service Channel Efficacy</h3>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <!-- Portal Stat -->
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div
+                            style="width:40px; height:40px; background:#ECFDF5; border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--success);">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:16px; font-weight:700;">4.8 CSAT <span
+                                    style="font-size:10px; color:var(--success);">▲ 0.3</span></div>
+                            <div style="font-size:11px; color:var(--text-muted);">Portal/Bot ($2/ticket)</div>
+                            <div style="font-size:9px; color:var(--success); font-weight:600; margin-top:2px;">Target:
+                                >4.5 ✓ | Vol: 8,420/mo</div>
+                        </div>
+                    </div>
+                    <!-- Email Stat -->
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div
+                            style="width:40px; height:40px; background:#FEF2F2; border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--danger);">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:16px; font-weight:700;">2.1 CSAT <span
+                                    style="font-size:10px; color:var(--danger);">▼ 0.4</span></div>
+                            <div style="font-size:11px; color:var(--text-muted);">Email ($25/ticket)</div>
+                            <div style="font-size:9px; color:var(--danger); font-weight:600; margin-top:2px;">Target:
+                                >3.5 ✗ | Vol: 3,850/mo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <table style="width:100%; font-size:10px; margin-bottom:10px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Channel</th>
+                            <th style="text-align:right;">Avg Res. Time</th>
+                            <th style="text-align:right;">1st Contact Res.</th>
+                            <th style="text-align:right;">Cost/Ticket</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight:600;">Portal/Bot</td>
+                            <td style="text-align:right;">4.2 min</td>
+                            <td style="text-align:right; color:var(--success);">89%</td>
+                            <td style="text-align:right; color:var(--success);">$2</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">Email</td>
+                            <td style="text-align:right;">18.5 hrs</td>
+                            <td style="text-align:right; color:var(--danger);">42%</td>
+                            <td style="text-align:right; color:var(--danger);">$25</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">Phone</td>
+                            <td style="text-align:right;">12.8 min</td>
+                            <td style="text-align:right; color:var(--warning);">68%</td>
+                            <td style="text-align:right; color:var(--warning);">$18</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="context-box">
+                    <div class="context-label">Optimization Opportunity</div>
+                    <p class="context-text">Migrating 45% of Email volume to Portal = <strong>$12,500/mo
+                            Savings</strong> and +2.0 CSAT.</p>
+                </div>
+            </div>
+
+            <!-- Regional Leaderboard (Dense) -->
+            <div class="card col-4 status-neutral">
+                <div class="card-header">
+                    <h3>Regional Performance</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th>Headcount</th>
+                            <th>Score</th>
+                            <th>Top Issue</th>
+                            <th>Action Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🇬🇧 London</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">4,200</td>
+                            <td>8.4 <span style="font-size:10px; color:var(--success);">▲0.2</span><br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.2</span></td>
+                            <td style="font-size:10px;">Mobile Access (92%)</td>
+                            <td style="font-size:10px; color:var(--text-muted);">Maintain</td>
+                        </tr>
+                        <tr>
+                            <td>🇺🇸 New York</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">6,800</td>
+                            <td>8.1 <span style="font-size:10px; color:var(--success);">▲0.4</span><br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.5</span></td>
+                            <td style="font-size:10px;">VPN Stability (88%)</td>
+                            <td style="font-size:10px; color:var(--success);">Monitor</td>
+                        </tr>
+                        <tr>
+                            <td>🇩🇪 Berlin</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">2,900</td>
+                            <td>7.8 <span style="font-size:10px; color:var(--text-secondary);">-0.0</span><br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.6</span></td>
+                            <td style="font-size:10px;">Hardware Perf (78%)</td>
+                            <td style="font-size:10px;"><a href="#">Refresh Cycle</a></td>
+                        </tr>
+                        <tr>
+                            <td>🇸🇬 Singapore</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">1,800</td>
+                            <td>7.2 <span style="font-size:10px; color:var(--warning);">▼0.1</span><br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±2.1</span></td>
+                            <td style="font-size:10px;">ISP Latency (65%)</td>
+                            <td style="font-size:10px; color:var(--warning);"><a href="#">Audit ISP</a></td>
+                        </tr>
+                        <tr>
+                            <td>🇮🇳 Bangalore</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">3,400</td>
+                            <td>6.5 <span style="font-size:10px; color:var(--danger);">▼0.8</span><br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±2.4</span></td>
+                            <td style="font-size:10px;">VDI Latency (48%)</td>
+                            <td style="font-size:10px; color:var(--danger); font-weight:700;"><a href="#"
+                                    style="color:inherit">Fix VDI Latency</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Role / Persona Scores -->
+            <div class="card col-4 status-neutral">
+                <div class="card-header">
+                    <h3>Persona Segmentation</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Count</th>
+                            <th>Happiness</th>
+                            <th>Top Pain Point</th>
+                            <th>Recommended Fix</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span style="font-weight:600;">Executive (VIP)</span></td>
+                            <td style="font-size:11px; color:var(--text-secondary);">85</td>
+                            <td style="color:var(--success);">8.8<br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±0.8</span></td>
+                            <td style="font-size:10px;">Mobile (5% complaints)</td>
+                            <td style="font-size:11px;">Maintain Priority</td>
+                        </tr>
+                        <tr>
+                            <td>Sales Rep</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">450</td>
+                            <td style="color:var(--warning);">7.1<br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.9</span></td>
+                            <td style="font-size:10px;">CRM Sync (38%)</td>
+                            <td style="font-size:11px;"><a href="#">Fix CRM Sync</a></td>
+                        </tr>
+                        <tr>
+                            <td>Developer</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">680</td>
+                            <td style="color:var(--danger);">6.2<br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±2.2</span></td>
+                            <td style="font-size:10px;">Admin Rights (62%)</td>
+                            <td style="font-size:11px;">Policy Review</td>
+                        </tr>
+                        <tr>
+                            <td>Support Agent</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">120</td>
+                            <td style="color:var(--success);">8.1<br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.1</span></td>
+                            <td style="font-size:10px;">Ticketing (12%)</td>
+                            <td style="font-size:11px;">Monitor</td>
+                        </tr>
+                        <tr>
+                            <td>HR Admin</td>
+                            <td style="font-size:11px; color:var(--text-secondary);">95</td>
+                            <td style="color:var(--warning);">7.4<br><span
+                                    style="font-size:9px; color:var(--text-muted);">σ: ±1.7</span></td>
+                            <td style="font-size:10px;">VDI Latency (45%)</td>
+                            <td style="font-size:11px;">Optimize VDI</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Negative Drivers List -->
+            <div class="card col-4 status-bad">
+                <div class="card-header">
+                    <h3>Top Negative Drivers</h3>
+                    <div class="ai-pill">Anomaly Detected</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Driver</th>
+                            <th>Vol</th>
+                            <th>Impact</th>
+                            <th>Affected Regions</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Hardware Performance</td>
+                            <td>215<br><span style="font-size:9px; color:var(--text-muted);">17% of neg.</span></td>
+                            <td style="color:var(--danger);">-1.2<br><span
+                                    style="font-size:9px; color:var(--text-muted);">pts/user</span></td>
+                            <td style="font-size:10px;">APAC (68%), EMEA (22%)</td>
+                            <td style="font-size:10px; font-weight:700; color:var(--danger);">Recall Model X</td>
+                        </tr>
+                        <tr>
+                            <td>VPN Stability</td>
+                            <td>180<br><span style="font-size:9px; color:var(--text-muted);">14% of neg.</span></td>
+                            <td style="color:var(--danger);">-0.9<br><span
+                                    style="font-size:9px; color:var(--text-muted);">pts/user</span></td>
+                            <td style="font-size:10px;">Global (Peak hrs)</td>
+                            <td style="font-size:10px;"><a href="#">Add Capacity</a></td>
+                        </tr>
+                        <tr>
+                            <td>SSO Authentication</td>
+                            <td>95<br><span style="font-size:9px; color:var(--text-muted);">8% of neg.</span></td>
+                            <td style="color:var(--warning);">-0.4<br><span
+                                    style="font-size:9px; color:var(--text-muted);">pts/user</span></td>
+                            <td style="font-size:10px;">AMER (85%)</td>
+                            <td style="font-size:10px;">Patch v2.4</td>
+                        </tr>
+                        <tr>
+                            <td>Software Updates</td>
+                            <td>42<br><span style="font-size:9px; color:var(--text-muted);">3% of neg.</span></td>
+                            <td style="color:var(--text-secondary);">-0.1<br><span
+                                    style="font-size:9px; color:var(--text-muted);">pts/user</span></td>
+                            <td style="font-size:10px;">Developers only</td>
+                            <td style="font-size:10px;">Schedule Review</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="context-box">
+                    <div class="context-label">Remediation Strategy</div>
+                    <p class="context-text">Recalling 215 "Model X" laptops will cost <strong>$250k</strong> but prevent
+                        projected <strong>$1.2M</strong> in churn/lost productivity.</p>
+                </div>
+            </div>
+
+            <!-- Performance Outliers (New Feature) -->
+            <div class="card col-12 status-bad">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger); margin-right:8px;"></i>
+                        Critical Experience Outliers (Top Failing Devices)</h3>
+                    <div class="ai-pill">Require Immediate Support</div>
+                </div>
+                <table style="width:100%; border-collapse: separate; border-spacing: 0 4px;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 12px 10px; font-size: 11px;">Device Name</th>
+                            <th style="padding: 12px 10px; font-size: 11px;">User (Role)</th>
+                            <th style="padding: 12px 10px; font-size: 11px;">Symptom</th>
+                            <th style="padding: 12px 10px; font-size: 11px;">Frequency</th>
+                            <th style="padding: 12px 10px; font-size: 11px;">Productivity Loss</th>
+                            <th style="padding: 12px 10px; font-size: 11px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background:#FEF2F2;">
+                            <td style="font-weight:700; font-family:monospace; padding: 12px 10px; font-size: 13px;">
+                                LAPTOP-SALES-099</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">Sarah J. (Top Sales)</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">BSOD (Driver_IRQL)</td>
+                            <td style="color:var(--danger); font-weight:700; padding: 12px 10px; font-size: 13px;">5x /
+                                Week</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">~12 Hrs</td>
+                            <td style="padding: 12px 10px; font-size: 13px;"><a href="#"
+                                    style="color:var(--brand-accent);">Priority Replace</a></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:700; font-family:monospace; padding: 12px 10px; font-size: 13px;">
+                                DEV-WS-02</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">Mike T. (Lead Dev)</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">System Freeze (RAM)</td>
+                            <td style="color:var(--danger); font-weight:700; padding: 12px 10px; font-size: 13px;">Daily
+                            </td>
+                            <td style="padding: 12px 10px; font-size: 13px;">~8 Hrs</td>
+                            <td style="padding: 12px 10px; font-size: 13px;"><a href="#"
+                                    style="color:var(--brand-accent);">Dispatch Tech</a></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:700; font-family:monospace; padding: 12px 10px; font-size: 13px;">
+                                EXEC-SURFACE-01</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">Amanda B. (VP)</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">Wifi Drops</td>
+                            <td style="color:var(--warning); font-weight:700; padding: 12px 10px; font-size: 13px;">
+                                Intermittent</td>
+                            <td style="padding: 12px 10px; font-size: 13px;">High Frustration</td>
+                            <td style="padding: 12px 10px; font-size: 13px;"><a href="#"
+                                    style="color:var(--brand-accent);">Concierge Fix</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="context-box">
+                    <div class="context-label">Impact Alert</div>
+                    <p class="context-text"><strong>Sarah J.</strong> (Sales) has lost an estimated
+                        <strong>$14k</strong> in potential deal velocity due to recurring hardware crashes this week.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

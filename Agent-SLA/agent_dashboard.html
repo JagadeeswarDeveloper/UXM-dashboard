@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Command Center | SLA</title>
+    <link rel="stylesheet" href="agent_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .hidden {
+            display: none !important;
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        /* Chart Stability */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            /* Fixed height prevents infinite resize loop */
+            width: 100%;
+        }
+
+        .chart-container-sm {
+            position: relative;
+            height: 120px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Health Grid */
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .health-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .gauge-label {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        /* Agent tabs */
+        .agent-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .agent-tab {
+            padding: 8px 14px;
+            background: #F1F5F9;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .agent-tab.active {
+            background: #6D28D9;
+            color: #fff;
+        }
+
+        .agent-tab-content {
+            display: none;
+        }
+
+        .agent-tab-content.active {
+            display: block;
+        }
+
+        /* Global Agent Panel */
+        .big-agent-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .big-agent-table thead th {
+            text-align: left;
+            padding: 12px 16px;
+            color: #64748B;
+            font-weight: 700;
+            border-bottom: 1px solid #E6EEF8;
+        }
+
+        .big-agent-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+        }
+
+        .agent-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .badge-score {
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .progress-wrap {
+            width: 180px;
+            background: #F1F5F9;
+            height: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        /* table visuals */
+        .big-agent-table tbody tr:hover {
+            background: #FBFDFF;
+        }
+
+        .agent-cell {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .agent-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 1px 4px rgba(2, 6, 23, 0.08);
+        }
+
+        .star-rating {
+            color: #F59E0B;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+
+        /* Heatmap table for incident distribution */
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .heatmap-table th,
+        .heatmap-table td {
+            padding: 10px 12px;
+            border: 1px solid #F1F5F9;
+            text-align: center;
+        }
+
+        .heatmap-row-title {
+            text-align: left;
+            padding-left: 16px;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .cell-low {
+            background: #06B6D4;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .cell-medium {
+            background: #F59E0B;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .cell-high {
+            background: #EF4444;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .cell-zero {
+            background: #94A3B8;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .heatmap-wrap {
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .heatmap-no-data {
+            text-align: center;
+            padding: 20px;
+            color: #64748B;
+            font-weight: 600;
+        }
+
+
+        /* Modal: SLA Scores */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 11, 13, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 860px;
+            max-width: 95%;
+            border-radius: 6px;
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.15);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid #EEF2FF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 12px 18px;
+            max-height: 420px;
+            overflow: auto;
+        }
+
+        .close-x {
+            cursor: pointer;
+            color: #64748B;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- LEFT SIDEBAR: Hierarchy -->
+        <aside class="sidebar glass-panel" style="padding: 20px;">
+            <div class="brand-title" onclick="switchView('team')" style="cursor: pointer;">
+                <i class="fa-solid fa-layer-group text-indigo"></i>
+                <span>AGENTS<span class="text-blue">.SLA</span></span>
+            </div>
+
+            <div style="margin-top: 20px; margin-bottom: 20px;">
+                <input type="text" placeholder="Search Agents..."
+                    style="width: 100%; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 10px 12px; border-radius: 8px; color: var(--text-primary); font-size: 13px;">
+            </div>
+
+            <div class="hierarchy-tree">
+                <div class="tree-node active" id="node-global" onclick="switchView('team')">
+                    <span><i class="fa-solid fa-globe text-indigo"></i> Global Service Desk</span>
+                </div>
+
+                <div class="node-children">
+                    <div class="tree-node" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        <span><i class="fa-solid fa-building text-blue"></i> APAC L2 Support</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+                    </div>
+                    <div class="node-children">
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Adarsh T R')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=adarsh"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Adarsh T R</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-teal);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Rajiv')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=rajiv"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Rajiv</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-teal);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Sai')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=sai"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Sai</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-amber);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'babu')">
+                            <div class="flex-center" style="gap: 8px;"><img
+                                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Babu</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-teal);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Sarah Jenkins')">
+                            <div class="flex-center" style="gap: 8px;"><img
+                                    src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Sarah Jenkins</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-amber);border-radius:50%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="node-children" style="margin-top:6px;">
+                    <div class="tree-node" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        <span><i class="fa-solid fa-building text-indigo"></i> EMEA L1 Support</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+                    </div>
+                    <div class="node-children">
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Naveen')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=naveen"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Naveen</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-teal);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Aravind')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=aravind"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Aravind</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-rose);border-radius:50%;"></div>
+                        </div>
+                        <div class="tree-node agent-node" onclick="switchView('agent', 'Priya')">
+                            <div class="flex-center" style="gap: 8px;"><img src="https://i.pravatar.cc/150?u=priya12"
+                                    style="width:20px;height:20px;border-radius:50%;"><span>Priya K</span></div>
+                            <div style="width:6px;height:6px;background:var(--accent-amber);border-radius:50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #E2E8F0;">
+                <a href="uxm_dashboard.html"
+                    style="display: block; color: var(--text-muted); text-decoration: none; font-size: 12px;">
+                    <i class="fa-solid fa-arrow-left"></i> Return to UXM
+                </a>
+            </div>
+        </aside>
+
+        <!-- CENTER CONTENT AREA -->
+        <main id="main-container" class="main-content">
+
+            <!-- VIEW 1: TEAM COMMAND CENTER -->
+            <section id="team-view" class="view-section animate-slide-in">
+                <!-- Header -->
+                <header class="page-header">
+                    <div>
+                        <h1 style="font-size: 20px; font-weight: 700;">Team Command Center</h1>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Real-time
+                            Operational Overview</div>
+                    </div>
+                    <div class="flex-center" style="gap: 12px; align-items:center;">
+                        <span class="badge badge-teal"><i class="fa-solid fa-check"></i> Systems Normal</span>
+                        <span class="badge badge-blue">Updated: Just now</span>
+                        <div style="width:1px; height:28px; background:#E6EEF8; margin-left:8px; margin-right:8px;">
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button id="btn-overview" onclick="showScores(true)"
+                                style="padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0; background:#fff; cursor:pointer; font-weight:600;">Overview</button>
+                            <button id="btn-scores" onclick="showScores(false)"
+                                style="padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0; background:#4F46E5; color:#fff; cursor:pointer; font-weight:600;">Agent
+                                Scores</button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- High Level Stats -->
+                <div class="kpi-grid">
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-inbox" style="margin-right:4px;"></i>Active Queue
+                        </div>
+                        <div class="kpi-value">68</div>
+                        <div class="kpi-trend text-blue"><i class="fa-solid fa-arrow-up"></i> 12% vs last hr</div>
+                        <div style="margin-top:8px;display:flex;gap:8px;font-size:11px;">
+                            <span style="background:#EFF6FF;color:#2563EB;padding:2px 6px;border-radius:10px;">P1:
+                                4</span>
+                            <span style="background:#FFF7ED;color:#C2410C;padding:2px 6px;border-radius:10px;">P2:
+                                12</span>
+                            <span style="background:#F0FDF4;color:#166534;padding:2px 6px;border-radius:10px;">P3:
+                                52</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-star" style="margin-right:4px;"></i>Team CSAT</div>
+                        <div class="kpi-value text-teal">4.8<span style="font-size:13px;color:#94A3B8;"> /5</span></div>
+                        <div class="kpi-trend text-teal"><i class="fa-solid fa-arrow-up"></i> +0.2 vs last week · Top 5%
+                        </div>
+                        <div style="margin-top:8px;font-size:11px;color:#64748B;">Responses: <strong>312</strong>
+                            &nbsp;|&nbsp; Avg Rating: <strong>4.8★</strong></div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-triangle-exclamation"
+                                style="margin-right:4px;"></i>SLA Breach</div>
+                        <div class="kpi-value text-rose">2</div>
+                        <div class="kpi-trend text-rose"><i class="fa-solid fa-bell"></i> Requires Attention</div>
+                        <div style="margin-top:8px;font-size:11px;color:#64748B;">INC029921 <span
+                                style="color:#E11D48;font-weight:700;">P1</span> · INC029944 <span
+                                style="color:#E11D48;font-weight:700;">P2</span></div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-users" style="margin-right:4px;"></i>Workforce
+                        </div>
+                        <div class="kpi-value text-indigo">12<span style="font-size:13px;color:#94A3B8;">/15</span>
+                        </div>
+                        <div class="kpi-trend text-indigo">Online Now · 3 on break</div>
+                        <div style="margin-top:8px;font-size:11px;color:#64748B;">Avg Util: <strong>78%</strong>
+                            &nbsp;|&nbsp; Overtime: <strong>2</strong></div>
+                    </div>
+                </div>
+
+                <!-- Team Charts Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Chart 1: Volume Trend -->
+                    <div class="glass-panel" style="padding: 20px;">
+                        <div class="flex-between" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 14px; font-weight: 700;">Incoming Volume (24h)</h3>
+                            <i class="fa-solid fa-chart-line text-blue"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="teamVolumeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Agent Leaderboard -->
+                    <div class="glass-panel" style="padding: 20px;">
+                        <div class="flex-between" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 14px; font-weight: 700;">Top Solvers Today</h3>
+                            <i class="fa-solid fa-trophy text-amber"></i>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="agentLeaderboardChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expanded Metrics: Operational Insights -->
+                <div class="glass-panel" style="padding: 20px;">
+                    <div class="flex-between" style="margin-bottom:16px;">
+                        <h3 style="font-size: 14px; font-weight: 700;">Operational Insights &amp; Trends</h3>
+                        <span style="font-size:11px;color:var(--text-muted);">Live · Updated every 60s</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+
+                        <!-- Widget 1: Channel Distribution -->
+                        <div style="padding:0 20px 0 0;border-right:1px solid #F1F5F9;">
+                            <h4 style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;font-weight:600;">
+                                <i class="fa-solid fa-share-nodes text-blue" style="margin-right:6px;"></i>INCOMING
+                                CHANNELS
+                            </h4>
+                            <div class="chart-container-sm"><canvas id="opsChannelChart"></canvas></div>
+                            <div
+                                style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:10px;font-size:11px;">
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:50%;background:#2563EB;display:inline-block;"></span>Portal
+                                    <strong>45%</strong> <span style="color:#94A3B8;">(31)</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:50%;background:#4F46E5;display:inline-block;"></span>Phone
+                                    <strong>25%</strong> <span style="color:#94A3B8;">(17)</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:50%;background:#0D9488;display:inline-block;"></span>Chat
+                                    <strong>20%</strong> <span style="color:#94A3B8;">(14)</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:50%;background:#64748B;display:inline-block;"></span>Email
+                                    <strong>10%</strong> <span style="color:#94A3B8;">(7)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Widget 2: Queue Aging -->
+                        <div style="padding:0 20px;border-right:1px solid #F1F5F9;">
+                            <h4 style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;font-weight:600;">
+                                <i class="fa-solid fa-clock-rotate-left text-amber" style="margin-right:6px;"></i>QUEUE
+                                AGING
+                            </h4>
+                            <div class="chart-container-sm"><canvas id="opsAgingChart"></canvas></div>
+                            <div
+                                style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:10px;font-size:11px;">
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:2px;background:#10B981;display:inline-block;"></span>&lt;4h:
+                                    <strong style="color:#10B981;">35 tickets</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:2px;background:#3B82F6;display:inline-block;"></span>4–24h:
+                                    <strong style="color:#3B82F6;">18 tickets</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>1–3d:
+                                    <strong style="color:#F59E0B;">9 tickets</strong>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span
+                                        style="width:8px;height:8px;border-radius:2px;background:#EF4444;display:inline-block;"></span>&gt;3d:
+                                    <strong style="color:#EF4444;">6 tickets ⚠</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Widget 3: Sentiment Pulse -->
+                        <div style="padding:0 0 0 20px;position:relative;">
+                            <h4 style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;font-weight:600;">
+                                <i class="fa-solid fa-heart-pulse text-rose" style="margin-right:6px;"></i>SENTIMENT
+                                PULSE
+                            </h4>
+                            <div class="chart-container-sm" style="position:relative;">
+                                <canvas id="opsSentimentChart"></canvas>
+                                <div
+                                    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">
+                                    <div style="font-weight:700;font-size:18px;color:var(--accent-teal);">+42</div>
+                                    <div style="font-size:9px;color:var(--text-muted);">NPS</div>
+                                </div>
+                            </div>
+                            <div
+                                style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:10px;font-size:11px;text-align:center;">
+                                <div>
+                                    <div style="font-weight:700;color:#10B981;">65%</div>
+                                    <div style="color:#94A3B8;">Positive</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight:700;color:#94A3B8;">25%</div>
+                                    <div style="color:#94A3B8;">Neutral</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight:700;color:#EF4444;">10%</div>
+                                    <div style="color:#94A3B8;">Negative</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- GLOBAL: Incident Reopen Trend (Heatmap) -->
+            <section id="global-heatmap-section" class="view-section">
+                <div class="glass-panel" style="padding:18px; margin-top:14px;">
+                    <div class="flex-between" style="margin-bottom:12px;">
+                        <h3 style="font-size:14px; font-weight:700;">Incident Reopen Trend</h3>
+                        <div style="font-size:13px; color:var(--text-muted);">By associate, level and priority</div>
+                    </div>
+                    <div class="heatmap-wrap">
+                        <table id="global-heatmap" class="heatmap-table">
+                            <!-- populated by JS -->
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW: GLOBAL AGENT PERFORMANCE (added alongside existing UI) -->
+            <section id="global-agent" class="view-section animate-slide-in">
+                <div class="glass-panel" style="padding: 20px; margin-top: 10px;">
+                    <div class="flex-between" style="margin-bottom: 12px;">
+                        <h3 style="font-size: 14px; font-weight: 700;">Agent Performance (Global)</h3>
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <span style="font-size: 13px; color: var(--text-muted);">All agents &bull; Last 30
+                                days</span>
+                            <span
+                                style="font-size:11px;background:#EFF6FF;color:#2563EB;padding:3px 8px;border-radius:10px;">SLA
+                                Target: 95%</span>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="big-agent-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th style="width:60px;">Score</th>
+                                    <th style="width:55px;">FCR%</th>
+                                    <th style="width:55px;">SLA%</th>
+                                    <th style="width:80px;">MTTR</th>
+                                    <th style="width:60px;">CSAT</th>
+                                    <th style="width:55px;">Calls</th>
+                                    <th style="width:70px;">Reopen%</th>
+                                    <th style="width:130px;">SLA Achieved</th>
+                                    <th style="width:80px;text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Adarsh -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('Adarsh T R');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=adarsh" alt="adarsh">
+                                                <div>
+                                                    <div style="font-weight:700;">Adarsh T R <span
+                                                            class="star-rating">★★★★★</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L2 &bull;
+                                                        Senior &bull; APAC</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#EEF2FF;color:#4338CA;">92</span>
+                                    </td>
+                                    <td><span style="color:#059669;font-weight:700;">94%</span></td>
+                                    <td><span style="color:#059669;font-weight:700;">94%</span></td>
+                                    <td><span style="color:#7C3AED;font-weight:700;">1.5h</span></td>
+                                    <td><span style="font-weight:700;">4.9★</span></td>
+                                    <td>318</td>
+                                    <td><span style="color:#10B981;font-weight:700;">2.1%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:94%;background:#065F46;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">94/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Adarsh T R');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Babu -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('babu');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="babu">
+                                                <div>
+                                                    <div style="font-weight:700;">Babu <span
+                                                            class="star-rating">★★★★☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L2 &bull;
+                                                        Analyst &bull; APAC</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#EEF2FF;color:#4338CA;">88</span>
+                                    </td>
+                                    <td><span style="color:#059669;font-weight:700;">90%</span></td>
+                                    <td><span style="color:#059669;font-weight:700;">90%</span></td>
+                                    <td><span style="color:#06B6D4;font-weight:700;">2.0h</span></td>
+                                    <td><span style="font-weight:700;">4.5★</span></td>
+                                    <td>289</td>
+                                    <td><span style="color:#10B981;font-weight:700;">4.1%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:90%;background:#065F46;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">90/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('babu');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Rajiv -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('Rajiv');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=rajiv" alt="rajiv">
+                                                <div>
+                                                    <div style="font-weight:700;">Rajiv <span
+                                                            class="star-rating">★★★★☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L1 &bull;
+                                                        Analyst &bull; APAC</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#EEF2FF;color:#4338CA;">85</span>
+                                    </td>
+                                    <td><span style="color:#059669;font-weight:700;">88%</span></td>
+                                    <td><span style="color:#059669;font-weight:700;">88%</span></td>
+                                    <td><span style="color:#06B6D4;font-weight:700;">1.6h</span></td>
+                                    <td><span style="font-weight:700;">4.6★</span></td>
+                                    <td>274</td>
+                                    <td><span style="color:#10B981;font-weight:700;">3.5%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:88%;background:#0EA5A9;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">88/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Rajiv');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Priya -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('Priya');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=priya12" alt="priya">
+                                                <div>
+                                                    <div style="font-weight:700;">Priya K <span
+                                                            class="star-rating">★★★★☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L1 &bull;
+                                                        Analyst &bull; EMEA</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#EEF2FF;color:#4338CA;">81</span>
+                                    </td>
+                                    <td><span style="color:#059669;font-weight:700;">83%</span></td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">79%</span></td>
+                                    <td><span style="color:#06B6D4;font-weight:700;">1.9h</span></td>
+                                    <td><span style="font-weight:700;">4.2★</span></td>
+                                    <td>211</td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">5.0%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:79%;background:#06B6D4;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">79/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Priya');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Naveen -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('Naveen');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=naveen" alt="naveen">
+                                                <div>
+                                                    <div style="font-weight:700;">Naveen <span
+                                                            class="star-rating">★★★☆☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L2 &bull;
+                                                        Analyst &bull; EMEA</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#FFF7ED;color:#C2410C;">80</span>
+                                    </td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">78%</span></td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">78%</span></td>
+                                    <td><span style="color:#06B6D4;font-weight:700;">2.0h</span></td>
+                                    <td><span style="font-weight:700;">4.1★</span></td>
+                                    <td>198</td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">7.8%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:78%;background:#0EA5A9;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">78/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Naveen');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Sai -->
+                                <tr>
+                                    <td><a href="#" onclick="openAgentView('Sai');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=sai" alt="sai">
+                                                <div>
+                                                    <div style="font-weight:700;">Sai <span
+                                                            class="star-rating">★★★☆☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L2 &bull;
+                                                        Analyst &bull; APAC</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#FFF7ED;color:#C2410C;">82</span>
+                                    </td>
+                                    <td><span style="color:#059669;font-weight:700;">85%</span></td>
+                                    <td><span style="color:#059669;font-weight:700;">85%</span></td>
+                                    <td><span style="color:#06B6D4;font-weight:700;">1.8h</span></td>
+                                    <td><span style="font-weight:700;">4.3★</span></td>
+                                    <td>231</td>
+                                    <td><span style="color:#F59E0B;font-weight:700;">6.2%</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:85%;background:#06B6D4;"></div>
+                                        </div><span style="font-size:10px;color:#64748B;">85/100</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Sai');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                                <!-- Aravind (low performer) -->
+                                <tr style="background:#FFF8F8;">
+                                    <td><a href="#" onclick="openAgentView('Aravind');return false;"
+                                            style="text-decoration:none;color:inherit;">
+                                            <div class="agent-cell"><img class="agent-avatar"
+                                                    src="https://i.pravatar.cc/150?u=aravind" alt="aravind">
+                                                <div>
+                                                    <div style="font-weight:700;">Aravind <span
+                                                            class="star-rating">★★☆☆☆</span></div>
+                                                    <div style="font-size:11px;color:var(--text-muted);">L3 &bull;
+                                                        Senior &bull; EMEA</div>
+                                                </div>
+                                            </div>
+                                        </a></td>
+                                    <td><span class="badge-score" style="background:#FFF1F2;color:#BE123C;">72</span>
+                                    </td>
+                                    <td><span style="color:#EF4444;font-weight:700;">70%</span></td>
+                                    <td><span style="color:#EF4444;font-weight:700;">70%</span></td>
+                                    <td><span style="color:#F97316;font-weight:700;">2.1h</span></td>
+                                    <td><span style="font-weight:700;">3.8★</span></td>
+                                    <td>162</td>
+                                    <td><span style="color:#EF4444;font-weight:700;">11.4% ⚠</span></td>
+                                    <td>
+                                        <div class="progress-wrap">
+                                            <div class="progress-bar" style="width:70%;background:#DC2626;"></div>
+                                        </div><span style="font-size:10px;color:#E11D48;">Below Target</span>
+                                    </td>
+                                    <td style="text-align:right;"><a href="#"
+                                            onclick="openSlaModal('Aravind');return false;"
+                                            style="color:#4F46E5;font-weight:600;font-size:12px;">Report</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- VIEW 2: AGENT DETAIL (Hidden by default) -->
+            <section id="agent-view" class="view-section animate-slide-in hidden">
+                <!-- Header -->
+                <header class="page-header">
+                    <div class="flex-center" style="gap: 16px;">
+                        <button onclick="switchView('team')"
+                            style="background: none; border: 1px solid #E2E8F0; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-secondary);">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div class="flex-center" style="gap: 12px;">
+                            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <div>
+                                <h1 style="font-size: 18px; font-weight: 700;" id="agent-name">Adarsh T R</h1>
+                                <div class="text-blue" style="font-size: 12px; font-weight: 600;">SENIOR ANALYST • L2
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-center" style="gap: 12px;">
+                        <span class="badge badge-teal">Available</span>
+                        <span class="badge badge-purp">Shift: 98%</span>
+                    </div>
+                </header>
+
+                <!-- Agent Stats -->
+                <div class="kpi-grid">
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-clock" style="margin-right:4px;"></i>MTTR</div>
+                        <div class="kpi-value text-blue" id="agent-kpi-mttr">1.5h</div>
+                        <div class="kpi-trend text-teal"><i class="fa-solid fa-arrow-down"></i> 45m vs Team Avg</div>
+                        <div style="margin-top:6px;font-size:11px;color:#64748B;">Team Avg: <strong>2.1h</strong>
+                            &nbsp;&bull;&nbsp; Target: <strong>&lt;2h</strong></div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-shield-halved"
+                                style="margin-right:4px;"></i>Resolution SLA
+                        </div>
+                        <div class="kpi-value text-indigo" id="agent-kpi-sla">94.5%</div>
+                        <div class="kpi-trend text-indigo">Target: 95% &nbsp;&bull;&nbsp; <span
+                                style="color:#E11D48;">-0.5%</span></div>
+                        <div style="margin-top:6px;font-size:11px;color:#64748B;">Response SLA: <strong>98.2%</strong>
+                            &nbsp;&bull;&nbsp; FCR: <strong>94%</strong></div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-hourglass-end"
+                                style="margin-right:4px;"></i>Backlog Aged
+                        </div>
+                        <div class="kpi-value text-rose" id="agent-kpi-backlog">3</div>
+                        <div class="kpi-trend text-rose">&gt; 30 Days old &nbsp;&bull;&nbsp; <i
+                                class="fa-solid fa-triangle-exclamation"></i> Action needed</div>
+                        <div style="margin-top:6px;font-size:11px;color:#64748B;">P1: <strong
+                                style="color:#E11D48;">1</strong>
+                            &nbsp; P2: <strong style="color:#D97706;">1</strong> &nbsp; P3: <strong>1</strong></div>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <div class="kpi-label"><i class="fa-solid fa-crown" style="margin-right:4px;"></i>VIP Tickets
+                        </div>
+                        <div class="kpi-value text-amber" id="agent-kpi-vip">1</div>
+                        <div class="kpi-trend text-amber"><i class="fa-solid fa-star"></i> High Priority
+                            &nbsp;&bull;&nbsp; CFO
+                            account</div>
+                        <div style="margin-top:6px;font-size:11px;color:#64748B;">CSAT: <strong>4.9★</strong>
+                            &nbsp;&bull;&nbsp;
+                            On-time: <strong>100%</strong></div>
+                    </div>
+                </div>
+
+                <!-- Chart Row: agent-level tabs -->
+                <div class="glass-panel" style="padding: 16px; margin-top: 12px;">
+                    <div class="agent-tabs" role="tablist">
+                        <div class="agent-tab active" data-target="tab-monthly">Monthly Trend</div>
+                        <div class="agent-tab" data-target="tab-skill">Skill Performance</div>
+                        <div class="agent-tab" data-target="tab-shift">Shift/ Priority Wise Sentiment</div>
+                    </div>
+
+                    <div id="tab-monthly" class="agent-tab-content active">
+                        <div class="chart-container" style="height: 240px;">
+                            <canvas id="agentMonthlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="tab-skill" class="agent-tab-content">
+                        <div style="overflow-x:auto; padding-top:10px;">
+                            <table id="agentSkillTable" style="width:100%; border-collapse: collapse; font-size:13px;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left; padding:8px; color:#64748B;">SKILL WISE INCIDENTS
+                                        </th>
+                                        <th style="padding:8px; color:#64748B;">SENTIMENT SCORE</th>
+                                        <th style="padding:8px; color:#64748B;">SLA</th>
+                                        <th style="padding:8px; color:#64748B;">FCR</th>
+                                        <th style="padding:8px; color:#64748B;">MTTR</th>
+                                        <th style="padding:8px; color:#64748B;">RATING</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tab-shift" class="agent-tab-content">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+                            <div class="chart-container" style="height:200px;"><canvas id="agentShiftChart"></canvas>
+                            </div>
+                            <div class="chart-container" style="height:200px;"><canvas id="agentPriorityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Table -->
+                <div class="glass-panel" style="padding: 0; overflow: hidden;">
+                    <div
+                        style="padding: 16px; border-bottom: 1px solid #E2E8F0; background: #F8FAFC; display:flex;justify-content:space-between;align-items:center;">
+                        <h3 style="font-size: 14px; font-weight: 700;">My Active Queue <span
+                                style="background:#EFF6FF;color:#2563EB;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;">6
+                                tickets</span></h3>
+                        <span style="font-size:11px;color:#64748B;">SLA Target: P1=15m, P2=1h, P3=4h</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Topic / Description</th>
+                                <th>Priority</th>
+                                <th>Channel</th>
+                                <th>State</th>
+                                <th>Assigned</th>
+                                <th style="text-align: right;">SLA Remaining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';color:var(--accent-rose);">INC029921</td>
+                                <td>VPN Auth Fail <span class="badge badge-red">Critical</span>
+                                    <div style="font-size:11px;color:#94A3B8;">User unable to authenticate via Pulse
+                                        Secure</div>
+                                </td>
+                                <td><strong style="color:#E11D48;">P1</strong></td>
+                                <td><i class="fa-solid fa-phone" style="color:#2563EB;"></i> Phone</td>
+                                <td><span
+                                        style="background:#FFF1F2;color:#E11D48;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">WIP</span>
+                                </td>
+                                <td>09:45 AM</td>
+                                <td style="text-align:right;color:var(--accent-rose);font-weight:700;">-12m <i
+                                        class="fa-solid fa-triangle-exclamation"></i></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';">INC029924</td>
+                                <td>Outlook Sync <span class="badge badge-amber">VIP</span>
+                                    <div style="font-size:11px;color:#94A3B8;">Calendar items not syncing to mobile
+                                        device</div>
+                                </td>
+                                <td><strong style="color:#D97706;">P2</strong></td>
+                                <td><i class="fa-solid fa-envelope" style="color:#D97706;"></i> Email</td>
+                                <td><span
+                                        style="background:#FFFBEB;color:#D97706;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">On
+                                        Hold</span></td>
+                                <td>10:10 AM</td>
+                                <td style="text-align:right;color:var(--accent-amber);">15m</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';">RITM3321</td>
+                                <td>Access Request<div style="font-size:11px;color:#94A3B8;">New joiner needs SAP S/4
+                                        read access — Finance team</div>
+                                </td>
+                                <td><strong>P3</strong></td>
+                                <td><i class="fa-solid fa-globe" style="color:#0D9488;"></i> Portal</td>
+                                <td><span
+                                        style="background:#F0FDF4;color:#059669;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">New</span>
+                                </td>
+                                <td>10:22 AM</td>
+                                <td style="text-align:right;color:var(--accent-teal);">4h 20m</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';">INC029930</td>
+                                <td>Printer Offline<div style="font-size:11px;color:#94A3B8;">HP LaserJet 3rd floor not
+                                        reachable from workstations</div>
+                                </td>
+                                <td><strong>P3</strong></td>
+                                <td><i class="fa-solid fa-comment" style="color:#4F46E5;"></i> Chat</td>
+                                <td><span
+                                        style="background:#F1F5F9;color:#475569;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Pending</span>
+                                </td>
+                                <td>10:55 AM</td>
+                                <td style="text-align:right;color:#475569;">3h 05m</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';">INC029938</td>
+                                <td>MFA Token Fail <span class="badge badge-red">Escalated</span>
+                                    <div style="font-size:11px;color:#94A3B8;">Azure AD MFA push not received — affects
+                                        12 users</div>
+                                </td>
+                                <td><strong style="color:#D97706;">P2</strong></td>
+                                <td><i class="fa-solid fa-phone" style="color:#2563EB;"></i> Phone</td>
+                                <td><span
+                                        style="background:#EFF6FF;color:#2563EB;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">WIP</span>
+                                </td>
+                                <td>11:02 AM</td>
+                                <td style="text-align:right;color:var(--accent-amber);">22m</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:'JetBrains Mono';">RITM3325</td>
+                                <td>Software Install<div style="font-size:11px;color:#94A3B8;">AutoCAD 2025 deployment
+                                        for Engineering — 3 seats</div>
+                                </td>
+                                <td><strong>P4</strong></td>
+                                <td><i class="fa-solid fa-globe" style="color:#0D9488;"></i> Portal</td>
+                                <td><span
+                                        style="background:#F0FDF4;color:#059669;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">New</span>
+                                </td>
+                                <td>11:18 AM</td>
+                                <td style="text-align:right;color:#94A3B8;">7h 40m</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- LOCAL: Agent Incident Heatmap -->
+                <div class="glass-panel" style="padding:16px; margin-top:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <h3 style="font-size:14px; font-weight:700; margin:0;">My Incident Breakdown</h3>
+                        <div style="font-size:12px;color:var(--text-muted);">Priority distribution by tower</div>
+                    </div>
+                    <div class="heatmap-wrap">
+                        <table id="agent-heatmap" class="heatmap-table">
+                            <!-- populated by JS -->
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- RIGHT SIDEBAR: Live Feed -->
+        <aside class="sidebar glass-panel" style="padding: 20px; background: #fff;">
+            <div class="feed-header">ServiceNow Stream <span
+                    style="float:right;font-size:10px;color:#10B981;font-weight:700;">● LIVE</span></div>
+
+            <div style="overflow-y: auto; height: calc(100% - 40px);">
+                <!-- Critical -->
+                <div style="font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin:4px 0 6px;">
+                    Critical</div>
+
+                <div class="feed-item urgent">
+                    <div class="flex-between"><span class="feed-time">Just Now</span><i
+                            class="fa-solid fa-bell text-rose"></i></div>
+                    <div class="feed-text"><strong>SLA Breach — P1</strong><br>INC029921 (VPN) overdue by 12m.
+                        Escalating to L3.</div>
+                </div>
+
+                <div class="feed-item urgent">
+                    <div class="flex-between"><span class="feed-time">3m ago</span><i
+                            class="fa-solid fa-triangle-exclamation text-rose"></i></div>
+                    <div class="feed-text"><strong>SLA Warning — P2</strong><br>INC029944 (Outlook - VIP) is 75% through
+                        SLA window. 22m remaining.</div>
+                </div>
+
+                <!-- Activity -->
+                <div style="font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin:10px 0 6px;">
+                    Activity</div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">5m ago</span><i
+                            class="fa-solid fa-user-plus text-blue"></i></div>
+                    <div class="feed-text"><strong>New Assignment</strong><br>RITM3325 (AutoCAD Install) assigned to
+                        Adarsh T R.</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">12m ago</span><i
+                            class="fa-solid fa-user-plus text-blue"></i></div>
+                    <div class="feed-text"><strong>Reassigned</strong><br>INC029938 (MFA) escalated from Sai → Rajiv
+                        (L2).</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">18m ago</span><i
+                            class="fa-solid fa-check-circle text-teal"></i></div>
+                    <div class="feed-text"><strong>Resolved</strong><br>INC029910 — Wi-Fi Dropoff closed by Naveen.
+                        MTTR: 1h 45m.</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">32m ago</span><i
+                            class="fa-solid fa-check-circle text-teal"></i></div>
+                    <div class="feed-text"><strong>Resolved</strong><br>INC029901 — Citrix launch error closed by
+                        Adarsh. FCR ✓</div>
+                </div>
+
+                <!-- CSAT -->
+                <div style="font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin:10px 0 6px;">
+                    CSAT Feedback</div>
+
+                <div class="feed-item" style="border-left-color:#F59E0B;background:#FFFBEB;">
+                    <div class="flex-between"><span class="feed-time">45m ago</span><i
+                            class="fa-solid fa-star text-amber"></i></div>
+                    <div class="feed-text"><strong>5/5 ★ — CSAT Received</strong><br>INC028211 by Adarsh. Comment:
+                        <em>"Resolved instantly, amazing!"</em>
+                    </div>
+                </div>
+
+                <div class="feed-item" style="border-left-color:#F59E0B;background:#FFFBEB;">
+                    <div class="flex-between"><span class="feed-time">1h ago</span><i
+                            class="fa-solid fa-star text-amber"></i></div>
+                    <div class="feed-text"><strong>3/5 ★ — CSAT Received</strong><br>INC028198 by Aravind. Comment:
+                        <em>"Took too long, but resolved."</em>
+                    </div>
+                </div>
+
+                <!-- System -->
+                <div style="font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;margin:10px 0 6px;">
+                    System</div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">1h 12m ago</span><i
+                            class="fa-solid fa-rotate text-blue"></i></div>
+                    <div class="feed-text"><strong>Ticket Reopened</strong><br>INC028944 reopened by user — assigned
+                        back to Sai (L2).</div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="flex-between"><span class="feed-time">2h ago</span><i class="fa-solid fa-shield-halved"
+                            style="color:#4F46E5;"></i></div>
+                    <div class="feed-text"><strong>Compliance Alert</strong><br>3 P1 tickets breached >30 days SLA.
+                        Review required before EOD.</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- SLA Modal Backdrop -->
+    <div id="sla-modal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <strong id="modal-title">Agent SLA Scores</strong>
+                    <div style="font-size:12px;color:var(--text-muted);">Prod_INC-CRITICAL-ResponseTime-900Sec</div>
+                </div>
+                <div class="close-x" onclick="closeSlaModal();"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content">
+                    <!-- populated by JS: per-agent summary + incidents -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Team View Charts ---
+
+        // Volume Trend (Area) - 24h with Incidents + Requests + Changes
+        new Chart(document.getElementById('teamVolumeChart'), {
+            type: 'line',
+            data: {
+                labels: ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                datasets: [
+                    {
+                        label: 'Incidents',
+                        data: [4, 3, 2, 1, 2, 5, 9, 14, 19, 23, 26, 22, 18, 21, 24, 28, 25, 20, 16, 12, 10, 8, 6, 5],
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37,99,235,0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Requests',
+                        data: [1, 1, 1, 0, 1, 2, 4, 7, 10, 12, 15, 13, 11, 12, 14, 16, 14, 11, 9, 7, 5, 4, 3, 2],
+                        borderColor: '#0D9488',
+                        backgroundColor: 'rgba(13,148,136,0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Changes',
+                        data: [0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 4, 3, 3, 4, 5, 4, 3, 2, 2, 1, 1, 0, 0],
+                        borderColor: '#7C3AED',
+                        backgroundColor: 'rgba(124,58,237,0.04)',
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        borderWidth: 2,
+                        borderDash: [4, 3]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { boxWidth: 10, font: { size: 11 }, padding: 10 }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            footer: (items) => { const total = items.reduce((s, i) => s + i.parsed.y, 0); return 'Total: ' + total; }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: { size: 10 } } },
+                    y: { grid: { color: '#F1F5F9' }, beginAtZero: true, ticks: { font: { size: 10 } } }
+                },
+                interaction: { mode: 'index', intersect: false }
+            }
+        });
+
+        // Top Solvers (Horizontal Bar) - 7 real agents with resolved counts
+        new Chart(document.getElementById('agentLeaderboardChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Adarsh T R', 'Babu', 'Rajiv', 'Sai', 'Priya K', 'Naveen', 'Aravind'],
+                datasets: [
+                    {
+                        label: 'Resolved Today',
+                        data: [18, 15, 13, 11, 9, 7, 5],
+                        backgroundColor: ['#2563EB', '#4F46E5', '#0D9488', '#06B6D4', '#8B5CF6', '#F59E0B', '#EF4444'],
+                        borderRadius: 5,
+                        barPercentage: 0.65
+                    },
+                    {
+                        label: 'Target',
+                        data: [15, 15, 15, 15, 15, 15, 15],
+                        backgroundColor: 'rgba(0,0,0,0.06)',
+                        borderRadius: 5,
+                        barPercentage: 0.65
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                if (ctx.datasetIndex === 0) return ' Resolved: ' + ctx.raw;
+                                return ' Daily Target: ' + ctx.raw;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { color: '#F1F5F9' }, beginAtZero: true, ticks: { font: { size: 10 } } },
+                    y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                }
+            }
+        });
+
+        // --- Operational Insights Charts ---
+
+        // 1. Channel Mix (Doughnut)
+        new Chart(document.getElementById('opsChannelChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Portal', 'Phone', 'Chat', 'Email'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: ['#2563EB', '#4F46E5', '#0D9488', '#64748B'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                }
+            }
+        });
+
+        // 2. Queue Aging (Bar)
+        new Chart(document.getElementById('opsAgingChart'), {
+            type: 'bar',
+            data: {
+                labels: ['<4h', '4-24h', '1-3d', '>3d'],
+                datasets: [{
+                    label: 'Tickets',
+                    data: [35, 12, 5, 2],
+                    backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'],
+                    borderRadius: 4,
+                    barPercentage: 0.5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                    y: { grid: { color: '#F8FAFC' }, beginAtZero: true, display: false }
+                }
+            }
+        });
+
+        // 3. Sentiment Pulse (Doughnut)
+        new Chart(document.getElementById('opsSentimentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: ['#10B981', '#94A3B8', '#EF4444'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+
+        // --- 2. Agent View Charts ---
+
+        // create two chart placeholders for monthly trend and shift/priority charts
+        let agentMonthlyChartRef = null;
+        let agentShiftChartRef = null;
+        let agentPriorityChartRef = null;
+
+        // Monthly trend (area) - initialize empty; will be populated per-agent
+        agentMonthlyChartRef = new Chart(document.getElementById('agentMonthlyChart'), {
+            type: 'line',
+            data: { labels: [], datasets: [] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Shift sentiment (bar) - per-shift
+        agentShiftChartRef = new Chart(document.getElementById('agentShiftChart'), {
+            type: 'bar',
+            data: { labels: ['Positive', 'Negative', 'Neutral'], datasets: [] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Priority sentiment (bar) - per-priority
+        agentPriorityChartRef = new Chart(document.getElementById('agentPriorityChart'), {
+            type: 'bar',
+            data: { labels: ['Positive', 'Negative', 'Neutral'], datasets: [] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Logic
+        function switchView(viewName, agentName) {
+            const teamView = document.getElementById('team-view');
+            const agentView = document.getElementById('agent-view');
+            const globalSection = document.getElementById('global-agent');
+            const globalHeatmapSection = document.getElementById('global-heatmap-section');
+
+            if (viewName === 'team') {
+                teamView.classList.remove('hidden');
+                agentView.classList.add('hidden');
+                if (globalSection) globalSection.classList.remove('hidden');
+                if (globalHeatmapSection) globalHeatmapSection.classList.remove('hidden');
+                document.getElementById('node-global').classList.add('active');
+                document.querySelectorAll('.agent-node').forEach(n => n.classList.remove('active'));
+            } else {
+                teamView.classList.add('hidden');
+                agentView.classList.remove('hidden');
+                if (globalSection) globalSection.classList.add('hidden');
+                if (globalHeatmapSection) globalHeatmapSection.classList.add('hidden');
+                document.getElementById('node-global').classList.remove('active');
+                if (agentName) populateAgentDetails(agentName);
+            }
+        }
+
+        // Toggle between Overview (charts) and Agent Scores (table)
+        function showScores(showOverview) {
+            const globalSection = document.getElementById('global-agent');
+            const btnOverview = document.getElementById('btn-overview');
+            const btnScores = document.getElementById('btn-scores');
+            if (!globalSection) return;
+            if (showOverview) {
+                // show charts (team view) and hide scores table
+                globalSection.classList.add('hidden');
+                if (btnOverview) { btnOverview.style.background = '#4F46E5'; btnOverview.style.color = '#fff'; }
+                if (btnScores) { btnScores.style.background = '#fff'; btnScores.style.color = '#000'; }
+            } else {
+                globalSection.classList.remove('hidden');
+                if (btnScores) { btnScores.style.background = '#4F46E5'; btnScores.style.color = '#fff'; }
+                if (btnOverview) { btnOverview.style.background = '#fff'; btnOverview.style.color = '#000'; }
+            }
+        }
+
+        // Sample agent KPI payloads for local view population
+        const sampleAgentKpis = {
+            'Adarsh T R': { mttr: '1.5 HOURS', sla: '94.5%', backlog: '1', vip: '0', score: '92' },
+            'Rajiv': { mttr: '1.6 HOURS', sla: '88%', backlog: '2', vip: '1', score: '85' },
+            'Sai': { mttr: '1.8 HOURS', sla: '85%', backlog: '0', vip: '0', score: '82' },
+            'babu': { mttr: '2.0 HOURS', sla: '90%', backlog: '2', vip: '0', score: '88' },
+            'Naveen': { mttr: '2.0 HOURS', sla: '78%', backlog: '3', vip: '2', score: '80' },
+            'Aravind': { mttr: '2.1 HOURS', sla: '70%', backlog: '5', vip: '1', score: '72' }
+        };
+
+        // Open the agent detail view and populate key KPIs
+        function openAgentView(agentName) {
+            // Switch view; population handled by switchView -> populateAgentDetails
+            switchView('agent', agentName);
+        }
+
+        // Populate KPIs and heatmap for the agent view (shared for sidebar + table links)
+        function populateAgentDetails(agentName) {
+            const lookupKey = (agentName || '').trim();
+            let data = sampleAgentKpis[lookupKey];
+            if (!data) {
+                const found = Object.keys(sampleAgentKpis).find(k => k.toLowerCase() === lookupKey.toLowerCase());
+                data = found ? sampleAgentKpis[found] : { mttr: '2.5 HOURS', sla: '80%', backlog: '0', vip: '0', score: '70' };
+            }
+            const kpiValues = document.querySelectorAll('#agent-view .kpi-card .kpi-value');
+            if (kpiValues && kpiValues.length >= 4) {
+                kpiValues[0].innerText = data.mttr;
+                kpiValues[1].innerText = data.sla;
+                kpiValues[2].innerText = data.backlog;
+                kpiValues[3].innerText = data.vip;
+            }
+            const title = document.getElementById('agent-name');
+            if (title) title.innerText = lookupKey || agentName || 'Agent';
+            try { renderAgentHeatmap(lookupKey); } catch (e) { console.warn('renderAgentHeatmap failed', e); }
+            try { renderAgentMonthly(lookupKey); } catch (e) { console.warn('renderAgentMonthly failed', e); }
+            try { renderAgentShiftAndPriority(lookupKey); } catch (e) { console.warn('renderAgentShiftAndPriority failed', e); }
+            try { renderAgentSkillTable(lookupKey); } catch (e) { console.warn('renderAgentSkillTable failed', e); }
+        }
+
+        // Init default state: show scores
+        document.addEventListener('DOMContentLoaded', function () { showScores(false); });
+
+        // --- SLA Modal Helpers (per-agent view) ---
+        const sampleAgentReports = {
+            'Adarsh T R': {
+                score: 92, mttr: '1.5 HOURS', sla: '94%', fcr: '94%', incidentsCount: 1240,
+                incidents: [
+                    { date: '2025-02-10', topic: 'VPN Auth Fail', priority: 'P1', state: 'Resolved', sla: '4h' },
+                    { date: '2025-02-11', topic: 'Email Sync', priority: 'P2', state: 'Resolved', sla: '8h' },
+                    { date: '2025-02-20', topic: 'Access Request', priority: 'P3', state: 'Resolved', sla: '4h' }
+                ]
+            },
+            'Rajiv': {
+                score: 85, mttr: '1.6 HOURS', sla: '88%', fcr: '88%', incidentsCount: 1030,
+                incidents: [{ date: '2025-02-12', topic: 'Outlook', priority: 'P2', state: 'Hold', sla: '15m' }]
+            },
+            'babu': {
+                score: 88, mttr: '2.0 HOURS', sla: '90%', fcr: '90%', incidentsCount: 560,
+                incidents: [
+                    { date: '2025-02-18', topic: 'VPN Access', priority: 'P3', state: 'Resolved', sla: '4h' },
+                    { date: '2025-02-19', topic: 'Printer Issue', priority: 'P3', state: 'Resolved', sla: '6h' }
+                ]
+            },
+            'default': {
+                score: 75, mttr: '2.5 HOURS', sla: '80%', fcr: '70%', incidentsCount: 400,
+                incidents: [{ date: '2025-02-14', topic: 'Sample', priority: 'P3', state: 'New', sla: '4h' }]
+            }
+        };
+
+        function openSlaModal(agentName) {
+            const backdrop = document.getElementById('sla-modal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+            const key = agentName || 'default';
+            const report = sampleAgentReports[key] || sampleAgentReports['default'];
+            title.innerText = (agentName || 'Agent') + ' SLA Scores';
+
+            // build summary + incidents table
+            let html = '';
+            html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <div>
+                            <div style="font-weight:700;font-size:16px;">${agentName}</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Prod_INC-CRITICAL-ResponseTime-900Sec</div>
+                        </div>
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <div style="text-align:right;"><div style="font-weight:700;font-size:18px;color:#4F46E5;">${report.score}</div><div style="font-size:12px;color:var(--text-muted);">Score</div></div>
+                            <div style="text-align:right;"><div style="font-weight:700;font-size:16px;color:#059669;">${report.sla}</div><div style="font-size:12px;color:var(--text-muted);">SLA%</div></div>
+                            <div style="text-align:right;"><div style="font-weight:700;font-size:16px;color:#7C3AED;">${report.mttr}</div><div style="font-size:12px;color:var(--text-muted);">MTTR</div></div>
+                        </div>
+                    </div>`;
+
+            html += `<div style="border-top:1px solid #EEF2FF;margin-top:8px;padding-top:12px;">
+                        <table style="width:100%; border-collapse: collapse; font-size:13px;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left; padding:8px; color:#64748B;">CLOSE DATE</th>
+                                    <th style="padding:8px; color:#64748B;">TOPIC</th>
+                                    <th style="padding:8px; color:#64748B;">PRIORITY</th>
+                                    <th style="padding:8px; color:#64748B;">STATE</th>
+                                    <th style="padding:8px; color:#64748B;">SLA</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+            report.incidents.forEach(it => {
+                html += `<tr>
+                            <td style="padding:8px 6px;color:#64748B;">${it.date}</td>
+                            <td style="padding:8px 6px;">${it.topic}</td>
+                            <td style="padding:8px 6px;">${it.priority}</td>
+                            <td style="padding:8px 6px;">${it.state}</td>
+                            <td style="padding:8px 6px;color:var(--text-muted);">${it.sla}</td>
+                         </tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+
+            content.innerHTML = html;
+            backdrop.style.display = 'flex';
+        }
+
+        function closeSlaModal() {
+            document.getElementById('sla-modal').style.display = 'none';
+        }
+
+        // --- Heatmap sample data and renderers ---
+        const heatmapGlobal = [
+            { name: 'Nagaraj', level: 'Level 1', counts: { P1: 0, P2: 0, P3: 1, P4: 0 } },
+            { name: 'Baishali', level: 'Level 1', counts: { P1: 0, P2: 0, P3: 20, P4: 0 } },
+            { name: 'Soumya', level: 'Level 2', counts: { P1: 0, P2: 0, P3: 1, P4: 0 } },
+            { name: 'Saran', level: 'Level 2', counts: { P1: 0, P2: 0, P3: 3, P4: 0 } },
+            { name: 'Pramod', level: 'Level 3', counts: { P1: 0, P2: 0, P3: 1, P4: 0 } },
+            { name: 'Koushal', level: 'Level 2', counts: { P1: 0, P2: 0, P3: 3, P4: 0 } },
+            { name: 'Amit', level: 'Level 1', counts: { P1: 0, P2: 0, P3: 5, P4: 0 } }
+        ];
+
+        const heatmapAgentSamples = {
+            'Adarsh T R': [
+                { tower: 'EUSS_REMOTE_SERVICES', P1: 0, P2: 0, P3: 1, P4: 0 },
+                { tower: 'NETWORK', P1: 0, P2: 0, P3: 0, P4: 0 }
+            ],
+            'Rajiv': [{ tower: 'EUSS_REMOTE_SERVICES', P1: 0, P2: 0, P3: 2, P4: 0 }],
+            'babu': [
+                { tower: 'GENERAL', P1: 0, P2: 0, P3: 2, P4: 0 },
+                { tower: 'NETWORK', P1: 0, P2: 1, P3: 3, P4: 0 },
+                { tower: 'APP_SERVICES', P1: 0, P2: 0, P3: 1, P4: 0 }
+            ],
+            'default': [{ tower: 'General', P1: 0, P2: 0, P3: 2, P4: 0 }]
+        };
+
+        function cellClass(val) {
+            if (!val || val === 0) return 'cell-zero';
+            if (val <= 2) return 'cell-low';
+            if (val <= 10) return 'cell-medium';
+            return 'cell-high';
+        }
+
+        function renderGlobalHeatmap() {
+            const table = document.getElementById('global-heatmap');
+            if (!table) return;
+            const header = `
+                <tr>
+                    <th class="heatmap-row-title">ASSOCIATE</th>
+                    <th>LEVEL</th>
+                    <th>P1</th>
+                    <th>P2</th>
+                    <th>P3</th>
+                    <th>P4</th>
+                </tr>`;
+            let rows = heatmapGlobal.map(r => {
+                const c = r.counts;
+                return `<tr>
+                    <td class="heatmap-row-title">${r.name}</td>
+                    <td>${r.level}</td>
+                    <td class="${cellClass(c.P1)}">${c.P1}</td>
+                    <td class="${cellClass(c.P2)}">${c.P2}</td>
+                    <td class="${cellClass(c.P3)}">${c.P3}</td>
+                    <td class="${cellClass(c.P4)}">${c.P4}</td>
+                </tr>`;
+            }).join('');
+            table.innerHTML = header + rows;
+        }
+
+        function renderAgentHeatmap(agentName) {
+            const table = document.getElementById('agent-heatmap');
+            if (!table) return;
+            // try exact key, then case-insensitive match (trim name first)
+            let key = (agentName || '').trim();
+            if (!heatmapAgentSamples[key]) {
+                const lower = key.toLowerCase();
+                const found = Object.keys(heatmapAgentSamples).find(k => k.toLowerCase() === lower);
+                if (found) key = found; else key = 'default';
+            }
+            const data = heatmapAgentSamples[key] || heatmapAgentSamples['default'];
+            // If we're using the generic default because there's no agent-specific data,
+            // show a clear no-data message rather than a generic "General" row.
+            const usedDefault = (key === 'default' && ((agentName || '').trim() !== 'default'));
+            if (usedDefault) {
+                table.innerHTML = `
+                    <tr>
+                        <th>TOWER</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>P3</th>
+                        <th>P4</th>
+                    </tr>
+                    <tr>
+                        <td class="heatmap-no-data" colspan="5">No tower-level data available for <strong>${(agentName || 'Agent').trim()}</strong></td>
+                    </tr>`;
+                console.info('renderAgentHeatmap: no agent-specific data for', agentName);
+                return;
+            }
+            const header = `
+                <tr>
+                    <th>TOWER</th>
+                    <th>P1</th>
+                    <th>P2</th>
+                    <th>P3</th>
+                    <th>P4</th>
+                </tr>`;
+            const rows = data.map(d => `
+                <tr>
+                    <td class="heatmap-row-title">${d.tower}</td>
+                    <td class="${cellClass(d.P1)}">${d.P1}</td>
+                    <td class="${cellClass(d.P2)}">${d.P2}</td>
+                    <td class="${cellClass(d.P3)}">${d.P3}</td>
+                    <td class="${cellClass(d.P4)}">${d.P4}</td>
+                </tr>
+            `).join('');
+            table.innerHTML = header + rows;
+        }
+
+        // render global on load and render agent heatmap when opening agent view
+        document.addEventListener('DOMContentLoaded', function () {
+            renderGlobalHeatmap();
+            initAgentTabHandlers();
+        });
+
+        // --- Agent extra sample data (monthly, skills, shift/priority sentiments)
+        const sampleAgentExtras = {
+            'Adarsh T R': {
+                monthly: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    Positive: [18, 22, 30, 25, 40, 35, 30, 45, 60, 65, 55, 50],
+                    Negative: [8, 10, 12, 9, 14, 10, 12, 11, 9, 8, 10, 9],
+                    Neutral: [40, 50, 60, 55, 70, 65, 60, 80, 85, 90, 88, 86]
+                },
+                skills: [
+                    { skill: 'Microsoft Teams', score: 85, sla: 90, fcr: '20%', mttr: '12.0H', rating: 4 },
+                    { skill: 'Outlook', score: 88, sla: 98, fcr: '52%', mttr: '8.0H', rating: 5 },
+                    { skill: 'Application', score: 90, sla: 95, fcr: '40%', mttr: '9.2H', rating: 4 }
+                ],
+                shifts: {
+                    'Shift A': [42, 34, 60],
+                    'Shift B': [55, 20, 65],
+                    'Shift C': [33, 40, 82]
+                },
+                priority: {
+                    'Critical': [20, 10, 60],
+                    'High': [40, 12, 66],
+                    'Medium': [30, 8, 50]
+                }
+            },
+            'Rajiv': { /* smaller sample */
+                monthly: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], Positive: [12, 18, 22, 28, 30, 34], Negative: [6, 4, 7, 8, 5, 6], Neutral: [30, 35, 40, 45, 50, 48] },
+                skills: [{ skill: 'Outlook', score: 78, sla: 88, fcr: '32%', mttr: '9.0H', rating: 3 }, { skill: 'VPN', score: 72, sla: 82, fcr: '28%', mttr: '11.0H', rating: 2 }],
+                shifts: { 'Shift A': [22, 12, 34], 'Shift B': [30, 8, 40] }, priority: { 'Critical': [10, 4, 20], 'High': [12, 6, 25] }
+            },
+            'Sai': { monthly: { labels: ['Jan', 'Feb', 'Mar', 'Apr'], Positive: [8, 12, 15, 10], Negative: [3, 2, 4, 1], Neutral: [20, 22, 24, 30] }, skills: [{ skill: 'Network', score: 70, sla: 80, fcr: '30%', mttr: '14.0H', rating: 2 }], shifts: { 'Shift A': [12, 5, 20] }, priority: { 'Medium': [8, 2, 15] } },
+            'Naveen': { monthly: { labels: ['Jan', 'Feb', 'Mar'], Positive: [5, 8, 12], Negative: [2, 3, 1], Neutral: [16, 18, 20] }, skills: [], shifts: {}, priority: {} },
+            'Aravind': { monthly: { labels: ['Jan', 'Feb'], Positive: [3, 6], Negative: [1, 2], Neutral: [8, 9] }, skills: [], shifts: {}, priority: {} },
+            'default': { monthly: { labels: ['Jan', 'Feb'], Positive: [2, 1], Negative: [1, 0], Neutral: [5, 6] }, skills: [], shifts: {}, priority: {} }
+        };
+
+        function initAgentTabHandlers() {
+            document.querySelectorAll('.agent-tab').forEach(t => {
+                t.addEventListener('click', function () {
+                    document.querySelectorAll('.agent-tab').forEach(x => x.classList.remove('active'));
+                    document.querySelectorAll('.agent-tab-content').forEach(x => x.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = this.getAttribute('data-target');
+                    const pane = document.getElementById(target);
+                    if (pane) pane.classList.add('active');
+                });
+            });
+        }
+
+        function renderAgentMonthly(agentName) {
+            const key = (agentName || '').trim();
+            const extras = sampleAgentExtras[key] || sampleAgentExtras[Object.keys(sampleAgentExtras).find(k => k.toLowerCase() === key.toLowerCase())] || sampleAgentExtras['default'];
+            const labels = extras.monthly.labels || [];
+            const dataPos = extras.monthly.Positive || [];
+            const dataNeg = extras.monthly.Negative || [];
+            const dataNeu = extras.monthly.Neutral || [];
+            agentMonthlyChartRef.data.labels = labels;
+            agentMonthlyChartRef.data.datasets = [
+                { label: 'Positive', data: dataPos, backgroundColor: 'rgba(37,99,235,0.12)', borderColor: '#2563EB', fill: true, tension: 0.4 },
+                { label: 'Negative', data: dataNeg, backgroundColor: 'rgba(16,185,129,0.08)', borderColor: '#10B981', fill: true, tension: 0.4 },
+                { label: 'Neutral', data: dataNeu, backgroundColor: 'rgba(245,158,11,0.08)', borderColor: '#F59E0B', fill: true, tension: 0.4 }
+            ];
+            agentMonthlyChartRef.update();
+        }
+
+        function renderAgentShiftAndPriority(agentName) {
+            const key = (agentName || '').trim();
+            const extras = sampleAgentExtras[key] || sampleAgentExtras[Object.keys(sampleAgentExtras).find(k => k.toLowerCase() === key.toLowerCase())] || sampleAgentExtras['default'];
+            // shifts
+            const shiftLabels = Object.keys(extras.shifts || {});
+            if (shiftLabels.length) {
+                agentShiftChartRef.data.labels = ['Positive', 'Negative', 'Neutral'];
+                agentShiftChartRef.data.datasets = shiftLabels.map((s, idx) => ({ label: s, data: extras.shifts[s], backgroundColor: ['#2563EB', '#06B6D4', '#F59E0B'][idx % 3] }));
+            } else {
+                agentShiftChartRef.data.labels = ['Positive', 'Negative', 'Neutral'];
+                agentShiftChartRef.data.datasets = [{ label: 'No shift data', data: [0, 0, 0], backgroundColor: '#94A3B8' }];
+            }
+            agentShiftChartRef.update();
+
+            // priority
+            const prLabels = Object.keys(extras.priority || {});
+            if (prLabels.length) {
+                agentPriorityChartRef.data.labels = ['Positive', 'Negative', 'Neutral'];
+                agentPriorityChartRef.data.datasets = prLabels.map((p, idx) => ({ label: p, data: extras.priority[p], backgroundColor: ['#DC2626', '#F59E0B', '#06B6D4'][idx % 3] }));
+            } else {
+                agentPriorityChartRef.data.labels = ['Positive', 'Negative', 'Neutral'];
+                agentPriorityChartRef.data.datasets = [{ label: 'No priority data', data: [0, 0, 0], backgroundColor: '#94A3B8' }];
+            }
+            agentPriorityChartRef.update();
+        }
+
+        function renderAgentSkillTable(agentName) {
+            const key = (agentName || '').trim();
+            const extras = sampleAgentExtras[key] || sampleAgentExtras[Object.keys(sampleAgentExtras).find(k => k.toLowerCase() === key.toLowerCase())] || sampleAgentExtras['default'];
+            const tbody = document.querySelector('#agentSkillTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!(extras.skills || []).length) {
+                tbody.innerHTML = '<tr><td class="heatmap-no-data" colspan="6">No skill performance data available for ' + (agentName || 'Agent') + '</td></tr>';
+                return;
+            }
+            extras.skills.forEach(s => {
+                const stars = '★'.repeat(s.rating || 0);
+                tbody.innerHTML += `<tr><td style="padding:8px 6px;">${s.skill}</td><td style="padding:8px 6px;">${s.score}</td><td style="padding:8px 6px;">${s.sla}%</td><td style="padding:8px 6px;">${s.fcr}</td><td style="padding:8px 6px;">${s.mttr}</td><td style="padding:8px 6px;">${stars}</td></tr>`;
+            });
+        }
+
+        // integrate these renders into agent population
+    </script>
+</body>
+
+</html>
